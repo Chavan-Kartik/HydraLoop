@@ -31,4 +31,6 @@ class TabularModel:
         return self
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        if X.shape[0] == 0:
+            return np.zeros(0, dtype=float)
         return self.model.predict_proba(X)[:, 1]

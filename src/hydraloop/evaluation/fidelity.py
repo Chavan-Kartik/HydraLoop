@@ -81,6 +81,52 @@ def _plots(out_dir: Path, df: pd.DataFrame) -> list[str]:
     return made
 
 
+def marginal_divergences(reference: pd.DataFrame, synthetic: pd.DataFrame) -> list[dict]:
+    """KS statistic and Wasserstein distance per feature against a reference set."""
+    from scipy.stats import ks_2samp, wasserstein_distance
+
+    rows = []
+    for col in _MARGINAL_FEATURES:
+        if col not in reference or col not in synthetic:
+            continue
+        r = reference[col].dropna().astype(float).to_numpy()
+        s = synthetic[col].dropna().astype(float).to_numpy()
+        if len(r) < 5 or len(s) < 5:
+            continue
+        rows.append(
+            {
+                "feature": col,
+                "ks": float(ks_2samp(r, s).statistic),
+                "wasserstein": float(wasserstein_distance(r, s)),
+            }
+        )
+    return rows
+
+
+def discriminator_auc(reference: pd.DataFrame, synthetic: pd.DataFrame) -> float:
+    """Train a classifier to tell reference from synthetic; AUC near 0.5 is good.
+
+    A discriminator that cannot separate the two distributions (AUC ~ 0.5) is
+    evidence of fidelity. This is the one fidelity check that benefits from an
+    external reference dataset; when none is available without credentials, the
+    caller documents that and relies on the declared-prior and sensitivity story
+    instead.
+    """
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.model_selection import cross_val_score
+
+    cols = [c for c in _MARGINAL_FEATURES if c in reference and c in synthetic]
+    r = reference[cols].dropna().astype(float)
+    s = synthetic[cols].dropna().astype(float)
+    n = min(len(r), len(s))
+    if n < 20:
+        return float("nan")
+    X = pd.concat([r.iloc[:n], s.iloc[:n]], ignore_index=True).to_numpy()
+    y = np.array([0] * n + [1] * n)
+    scores = cross_val_score(LogisticRegression(max_iter=500), X, y, cv=3, scoring="roc_auc")
+    return float(scores.mean())
+
+
 def lifecycle_validity(df: pd.DataFrame) -> dict:
     captured_without_approval = int(((df["captured_minor"] > 0) & (~df["approved"])).sum())
     disputed_without_capture = int(((df["disputed"]) & (df["captured_minor"] <= 0)).sum())
