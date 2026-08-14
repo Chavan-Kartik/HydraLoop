@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HydraLoop Attack Genome",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "synthetic_identity",
+        "account_takeover",
+        "social_engineering",
+        "merchant_abuse",
+        "card_testing",
+        "money_movement"
+      ]
+    },
+    "attack_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parent_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "genes": {
+      "type": "object",
+      "properties": {
+        "victim_selection": {
+          "type": "object",
+          "properties": {
+            "age_band": {
+              "type": "string",
+              "enum": [
+                "18_24",
+                "25_34",
+                "35_44",
+                "45_54",
+                "55_plus"
+              ]
+            },
+            "balance_percentile_lo": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "balance_percentile_hi": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "target_side": {
+              "type": "string",
+              "enum": [
+                "victim",
+                "account"
+              ]
+            }
+          },
+          "required": [
+            "age_band",
+            "balance_percentile_lo",
+            "balance_percentile_hi",
+            "target_side"
+          ],
+          "additionalProperties": false
+        },
+        "amount_policy": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "flat",
+                "ladder",
+                "random"
+              ]
+            },
+            "base": {
+              "type": "string",
+              "enum": [
+                "balance",
+                "limit"
+              ]
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+              },
+              "minItems": 1,
+              "maxItems": 6
+            },
+            "max_fraction": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            }
+          },
+          "required": [
+            "type",
+            "base",
+            "steps",
+            "max_fraction"
+          ],
+          "additionalProperties": false
+        },
+        "timing_policy": {
+          "type": "object",
+          "properties": {
+            "inter_txn_delay_mu": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 12.0
+            },
+            "inter_txn_delay_sigma": {
+              "type": "number",
+              "minimum": 0.05,
+              "maximum": 3.0
+            },
+            "dwell_before_cashout_h": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 168.0
+            }
+          },
+          "required": [
+            "inter_txn_delay_mu",
+            "inter_txn_delay_sigma",
+            "dwell_before_cashout_h"
+          ],
+          "additionalProperties": false
+        },
+        "device_policy": {
+          "type": "object",
+          "properties": {
+            "reuse": {
+              "type": "string",
+              "enum": [
+                "victim_device",
+                "new_device",
+                "rotating"
+              ]
+            },
+            "tamper": {
+              "type": "boolean"
+            },
+            "device_count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "required": [
+            "reuse",
+            "tamper",
+            "device_count"
+          ],
+          "additionalProperties": false
+        },
+        "channel_mix": {
+          "type": "object",
+          "properties": {
+            "weights": {
+              "type": "object",
+              "properties": {
+                "a2a": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "wallet": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "card_not_present": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "a2a",
+                "wallet",
+                "card_not_present"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "weights"
+          ],
+          "additionalProperties": false
+        },
+        "network_topology": {
+          "type": "object",
+          "properties": {
+            "mule_fanout": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "mule_fanin": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            "layering_depth": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          },
+          "required": [
+            "mule_fanout",
+            "mule_fanin",
+            "layering_depth"
+          ],
+          "additionalProperties": false
+        },
+        "friction_response": {
+          "type": "object",
+          "properties": {
+            "abandon_prob": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "retry_after_h": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 72.0
+            },
+            "max_retries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            }
+          },
+          "required": [
+            "abandon_prob",
+            "retry_after_h",
+            "max_retries"
+          ],
+          "additionalProperties": false
+        },
+        "resource_budget": {
+          "type": "object",
+          "properties": {
+            "mule_accounts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            },
+            "synthetic_identities": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 50
+            },
+            "devices": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
+            "operator_hours": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 100.0
+            }
+          },
+          "required": [
+            "mule_accounts",
+            "synthetic_identities",
+            "devices",
+            "operator_hours"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "victim_selection",
+        "amount_policy",
+        "timing_policy",
+        "device_policy",
+        "channel_mix",
+        "network_topology",
+        "friction_response",
+        "resource_budget"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "family",
+    "genes"
+  ],
+  "additionalProperties": true
+}
