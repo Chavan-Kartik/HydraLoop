@@ -33,4 +33,23 @@ These feed `blue/costs.py`. Every entry is swept +/-50% in the sensitivity analy
 | C10 | block_prob_hold | 0.50 | 0.3 - 0.7 | a hold deters fraud during review | sweep |
 | C11 | block_prob_manual_review | 0.85 | 0.6 - 0.95 | reviewers block most true fraud | sweep |
 
+## Attacker economics (Phase 9 fitness and resource costs)
+
+Fitness = w_value*value_settled - w_resource*resource_cost - w_time*time_to_cashout
+- w_detection*detection_events - w_friction*friction_events, with a hard guard that
+a zero-attempt genome scores minus infinity (no degenerate never-transact optimum).
+Every weight and unit cost is swept +/-50% in the sensitivity analysis.
+
+| ID | Parameter | Value | Range | Justification | Sensitivity Plan |
+|---|---|---:|---|---|---|
+| E01 | w_value | 1.0 | fixed reference | value settled is the numeraire | anchor |
+| E02 | w_resource | 1.0 | 0.5 - 1.5 | resources priced in the same minor units | sweep |
+| E03 | w_time | 200 | 100 - 300 | cost per hour to cash out | sweep |
+| E04 | w_detection | 30000 | 15000 - 45000 | a detection event is expensive for the attacker | sweep |
+| E05 | w_friction | 8000 | 4000 - 12000 | each step-up encountered costs the attacker | sweep |
+| E06 | cost_mule_account | 5000 | 2500 - 7500 | price of a mule account | sweep |
+| E07 | cost_synthetic_identity | 8000 | 4000 - 12000 | price of a synthetic identity | sweep |
+| E08 | cost_device | 1500 | 750 - 2250 | price of a burner device | sweep |
+| E09 | cost_operator_hour | 4000 | 2000 - 6000 | attacker operator hourly cost | sweep |
+
 Any assumption not listed here must be added before use.
