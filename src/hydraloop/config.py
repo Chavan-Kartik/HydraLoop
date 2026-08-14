@@ -28,7 +28,10 @@ class SimulationConfig:
     label_delay_hours_mean: float = 48.0
     label_delay_hours_std: float = 24.0
     horizon_days: int = 45
-    friendly_fraud_rate: float = 0.10
+    # Base rate at which a legitimate captured transaction is nonetheless
+    # disputed; every such dispute is friendly fraud (disputed and not fraud).
+    friendly_fraud_rate: float = 0.005
+    # Fraction of genuine fraud that is never disputed (fraud and not disputed).
     under_report_rate: float = 0.25
     dispute_window_days: int = 120
 
