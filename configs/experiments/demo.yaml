@@ -11,9 +11,9 @@ safety:
 simulation:
   seed: 42
   generations: 3
-  legitimate_transactions_per_generation: 1500
-  attack_episodes_per_generation: 30
-  fraud_rate_target: 0.012
+  legitimate_transactions_per_generation: 9000
+  attack_episodes_per_generation: 140
+  fraud_rate_target: 0.02
   label_delay_enabled: true
   label_delay_hours_mean: 48
   label_delay_hours_std: 24
