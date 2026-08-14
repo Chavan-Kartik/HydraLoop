@@ -10,6 +10,8 @@ flag.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import pandas as pd
@@ -35,3 +37,27 @@ def load_holdout(path: Path | None = None) -> pd.DataFrame:
         )
     path = path or (HOLDOUT_DIR / "transactions_holdout.parquet")
     return pd.read_parquet(path)
+
+
+@contextmanager
+def final_evaluation_access() -> Iterator[None]:
+    """Temporarily unseal the holdout for a final-evaluation read only.
+
+    The unseal flag is manipulated exclusively here, inside the guard, so that no
+    training module ever names it. The previous environment is always restored.
+    """
+    prev = os.environ.get(_ALLOW_ENV)
+    os.environ[_ALLOW_ENV] = "1"
+    try:
+        yield
+    finally:
+        if prev is None:
+            os.environ.pop(_ALLOW_ENV, None)
+        else:
+            os.environ[_ALLOW_ENV] = prev
+
+
+def load_holdout_final(path: Path | None = None) -> pd.DataFrame:
+    """Read the zero-day holdout for final evaluation, unsealing within the guard."""
+    with final_evaluation_access():
+        return load_holdout(path)
