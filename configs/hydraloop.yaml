@@ -1,0 +1,52 @@
+project:
+  name: HydraLoop
+  mode: synthetic_sandbox
+  version: 0.1.0
+
+safety:
+  synthetic_only: true
+  live_targeting: false
+  content_generation: false
+  operational_tooling: false
+
+simulation:
+  seed: 42
+  generations: 3
+  legitimate_transactions_per_generation: 1000
+  attack_episodes_per_generation: 20
+  fraud_rate_target: 0.01
+  label_delay_enabled: true
+  label_delay_hours_mean: 48
+  label_delay_hours_std: 24
+
+payment_lifecycle:
+  enable_step_up: true
+  enable_hold: true
+  enable_decline: true
+  enable_delayed_dispute: true
+  settlement_delay_hours: 12
+
+defender:
+  model_type: lightgbm
+  calibration: isotonic
+  step_up_budget_rate: 0.02
+  daily_review_capacity: 400
+  latency_budget_ms: 150
+
+red_team:
+  mutation_rate: 0.2
+  crossover_rate: 0.1
+  elite_archive_size: 100
+  use_llm_strategist: false
+  use_quality_diversity: false
+
+evaluation:
+  primary_metric: pr_auc
+  secondary_metrics:
+    - roc_auc
+    - recall_at_fpr_0_1
+    - recall_at_fpr_0_5
+    - recall_at_fpr_1_0
+    - value_detection_rate
+    - expected_calibration_error
+    - attacker_roi
