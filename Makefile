@@ -1,6 +1,6 @@
 PY ?= python
 
-.PHONY: setup test lint demo twin attack train stack evolve loop report api ui authenticity
+.PHONY: setup test lint demo twin attack train stack evolve evaluate loop report api ui authenticity
 
 setup:
 	$(PY) -m pip install --upgrade pip
@@ -34,6 +34,9 @@ stack:
 
 evolve:
 	$(PY) -m hydraloop evolve
+
+evaluate:
+	$(PY) -m hydraloop evaluate
 
 loop:
 	$(PY) -m hydraloop loop

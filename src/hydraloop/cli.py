@@ -105,6 +105,20 @@ def loop(
 
 
 @app.command()
+def evaluate(
+    config: str = typer.Option(None),
+    run_id: str = typer.Option(None),
+) -> None:
+    """Run the evaluation rigour suite: LOFO, zero-day, drift, fidelity, tornado (Phase 10)."""
+    from .evaluation.run import run_evaluation
+
+    cfg = load_config(config)
+    rid = run_id or _new_run_id()
+    out = run_evaluation(cfg, rid)
+    typer.echo(f"Evaluation report written to {out}")
+
+
+@app.command()
 def evolve(
     config: str = typer.Option(None),
     generations: int = typer.Option(15, help="Co-evolution generations (Gate G4 needs 15+)."),
