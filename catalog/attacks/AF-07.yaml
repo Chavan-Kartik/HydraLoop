@@ -1,0 +1,22 @@
+attack_id: AF-07
+attack_name: "Automation-driven account navigation and drain"
+family: account_takeover
+payment_surface: [card_not_present, wallet_topup]
+genai_role: >
+  Hypothesised scripted navigation of account surfaces that mimics human timing
+  while systematically probing payment paths. We model the regularity signature
+  of machine-paced navigation, not any automation code.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Inter-action timings are unusually regular"
+  - "Navigation covers payment paths a normal user rarely visits together"
+behavioral_signals:
+  - inter_action_timing_regularity
+  - rare_path_coverage
+  - hesitation_events_absent
+  - amount_probe_sequence
+detection_hypotheses: [automation_regularity, path_coverage_anomaly]
+mitigation_options: [step_up_3ds, soft_warn, manual_review]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No tooling; timing-regularity parameters only."

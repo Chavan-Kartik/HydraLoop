@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HydraLoop Threat Scenario",
+  "type": "object",
+  "properties": {
+    "attack_id": { "type": "string", "pattern": "^AF-[0-9]{2}$" },
+    "attack_name": { "type": "string", "minLength": 4 },
+    "family": {
+      "type": "string",
+      "enum": [
+        "synthetic_identity",
+        "account_takeover",
+        "social_engineering",
+        "merchant_abuse",
+        "card_testing",
+        "money_movement"
+      ]
+    },
+    "payment_surface": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "genai_role": { "type": "string", "minLength": 10 },
+    "abstraction_level": {
+      "type": "string",
+      "enum": ["behavioral_metadata_only"]
+    },
+    "assumptions": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "behavioral_signals": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+    "detection_hypotheses": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "mitigation_options": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "risk_level": { "type": "string", "enum": ["low", "medium", "high"] },
+    "validation_status": {
+      "type": "string",
+      "enum": ["unverified_hypothetical", "assumed", "reference_supported"]
+    },
+    "harm_review": { "type": "string", "minLength": 10 },
+    "evolvable": { "type": "boolean" },
+    "genome_template": { "type": "object" }
+  },
+  "required": [
+    "attack_id",
+    "attack_name",
+    "family",
+    "payment_surface",
+    "genai_role",
+    "abstraction_level",
+    "assumptions",
+    "behavioral_signals",
+    "detection_hypotheses",
+    "mitigation_options",
+    "risk_level",
+    "validation_status",
+    "harm_review"
+  ],
+  "additionalProperties": false
+}

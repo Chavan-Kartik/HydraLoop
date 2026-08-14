@@ -1,0 +1,30 @@
+attack_id: AF-02
+attack_name: "Synthetic-identity bust-out after cultivation"
+family: synthetic_identity
+payment_surface: [card_not_present, account_to_account_transfer]
+genai_role: >
+  Hypothesised orchestration of a cultivation period of normal-looking activity
+  followed by a coordinated maximum-value extraction. We simulate the timing and
+  amount footprint of cultivation-then-bust-out, not any content or tooling.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "A dormant cultivation window precedes rapid escalation"
+  - "Bust-out amounts approach available balance or limit"
+behavioral_signals:
+  - dormancy_then_spike_flag
+  - amount_ladder_slope
+  - limit_utilisation_percentile
+  - new_payee_burst
+detection_hypotheses: [account_side_anomaly, escalation_detection]
+mitigation_options: [dynamic_limit, cooling_off_hold, manual_review]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No scripts, no tooling, behavioural parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "25_34", target_side: account}
+  amount_policy: {type: ladder, base: limit, steps: [0.1, 0.35, 0.7, 0.95], max_fraction: 0.95}
+  timing_policy: {inter_txn_delay_mu: 5.0, inter_txn_delay_sigma: 0.8, dwell_before_cashout_h: 1.5}
+  device_policy: {reuse: new_device, tamper: true, device_count: 3}
+  network_topology: {mule_fanout: 2, mule_fanin: 1, layering_depth: 1}
+  resource_budget: {mule_accounts: 2, synthetic_identities: 1, devices: 3, operator_hours: 4.0}

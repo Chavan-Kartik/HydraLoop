@@ -1,0 +1,22 @@
+attack_id: AF-20
+attack_name: "Subscription-trial validation abuse"
+family: card_testing
+payment_surface: [card_not_present, merchant_acquiring]
+genai_role: >
+  Hypothesised use of low- or zero-value trial authorisations to validate cards
+  under the cover of subscription sign-ups. We model the trial-authorisation
+  footprint only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Zero or near-zero authorisations concentrate at trial-friendly merchants"
+  - "Few of these convert to genuine ongoing subscriptions"
+behavioral_signals:
+  - trial_auth_ratio
+  - conversion_to_recurring_rate
+  - merchant_trial_concentration
+  - card_reuse_across_trials
+detection_hypotheses: [trial_abuse_detection, conversion_anomaly]
+mitigation_options: [step_up_3ds, merchant_review]
+risk_level: low
+validation_status: unverified_hypothetical
+harm_review: "No trial-abuse tooling; authorisation-ratio statistics only."

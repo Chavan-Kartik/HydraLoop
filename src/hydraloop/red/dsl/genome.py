@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from dataclasses import dataclass
@@ -93,6 +94,26 @@ def default_genome(family: str = "social_engineering", attack_id: str | None = N
     return Genome(family=family, genes=default_genes(), attack_id=attack_id)
 
 
+def _deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
+    out = copy.deepcopy(base)
+    for k, v in overlay.items():
+        if isinstance(v, dict) and isinstance(out.get(k), dict):
+            out[k] = _deep_merge(out[k], v)
+        else:
+            out[k] = copy.deepcopy(v)
+    return out
+
+
+def genome_from_template(
+    family: str, attack_id: str, template: dict[str, Any] | None = None
+) -> Genome:
+    """Build a valid genome by merging a scenario's partial template over defaults."""
+    genes = _deep_merge(default_genes(), template or {})
+    g = Genome(family=family, genes=genes, attack_id=attack_id, label=f"{attack_id}.g0.v0")
+    g.validate()
+    return g
+
+
 def _check_field(path: str, spec, value: Any) -> None:
     kind = spec.kind
     if kind == "float":
@@ -175,6 +196,7 @@ __all__ = [
     "GenomeValidationError",
     "canonical_json",
     "genome_from_dict",
+    "genome_from_template",
     "default_genome",
     "validate_genome_dict",
 ]

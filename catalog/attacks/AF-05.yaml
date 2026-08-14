@@ -1,0 +1,31 @@
+attack_id: AF-05
+attack_name: "Credential stuffing at machine speed"
+family: account_takeover
+payment_surface: [card_not_present, wallet_topup]
+genai_role: >
+  Hypothesised use of automation to test large credential sets and adapt request
+  cadence to avoid rate limits. We simulate the velocity and device-rotation
+  footprint only; no credential lists or tooling are represented.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Login-to-payment latency is atypically short for automated sessions"
+  - "Device and IP-ASN rotation accompanies success bursts"
+behavioral_signals:
+  - login_to_payment_latency
+  - device_rotation_rate
+  - failed_then_success_burst
+  - asn_diversity_zscore
+detection_hypotheses: [session_automation_signature, velocity_anomaly]
+mitigation_options: [step_up_3ds, rate_limit_hold, device_binding]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No credential data, no automation tooling; cadence parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "35_44", target_side: account}
+  amount_policy: {type: flat, base: balance, steps: [0.2], max_fraction: 0.3}
+  timing_policy: {inter_txn_delay_mu: 2.0, inter_txn_delay_sigma: 0.5, dwell_before_cashout_h: 0.5}
+  device_policy: {reuse: rotating, tamper: true, device_count: 8}
+  channel_mix: {weights: {a2a: 0.1, wallet: 0.4, card_not_present: 0.5}}
+  friction_response: {abandon_prob: 0.6, retry_after_h: 1.0, max_retries: 4}
+  resource_budget: {mule_accounts: 1, synthetic_identities: 0, devices: 8, operator_hours: 1.0}

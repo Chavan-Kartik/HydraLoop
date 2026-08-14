@@ -1,0 +1,22 @@
+attack_id: AF-15
+attack_name: "Refund and chargeback abuse"
+family: merchant_abuse
+payment_surface: [card_not_present, merchant_acquiring]
+genai_role: >
+  Hypothesised systematic extraction of value via refunds or disputes that do
+  not reflect genuine grievances. We model the refund-timing and repeat-disputer
+  footprint only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Refunds cluster shortly after capture"
+  - "A subset of accounts disputes repeatedly across merchants"
+behavioral_signals:
+  - refund_latency_distribution
+  - repeat_disputer_index
+  - refund_to_capture_ratio
+  - cross_merchant_dispute_spread
+detection_hypotheses: [refund_pattern_anomaly, repeat_disputer_scoring]
+mitigation_options: [refund_hold, manual_review]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No dispute-fraud instructions; refund-timing statistics only."
