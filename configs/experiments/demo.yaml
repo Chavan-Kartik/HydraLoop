@@ -1,0 +1,14 @@
+experiment:
+  name: demo
+  description: Minimal governed demo run for Phase 0
+
+run:
+  seed: 42
+  generations: 1
+  legitimate_transactions: 100
+  attack_episodes: 5
+
+safety:
+  synthetic_only: true
+  live_targeting: false
+  content_generation: false

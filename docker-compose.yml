@@ -1,0 +1,6 @@
+services:
+  hydraloop:
+    build: .
+    command: sh -c "python scripts/write_run_manifest.py && python scripts/hello_pipeline.py"
+    volumes:
+      - ./reports:/app/reports
