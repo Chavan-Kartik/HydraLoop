@@ -45,6 +45,7 @@ make demo
 python -m hydraloop twin      # generate legitimate traffic
 python -m hydraloop attack    # execute catalog genomes in the twin
 python -m hydraloop train     # blue-team baseline + metrics
+python -m hydraloop stack     # deep defence stack + ablation table
 python -m hydraloop loop      # co-evolution with the regression gauntlet
 
 # Command-center backend (serves REST + the arena WebSocket on :8000).

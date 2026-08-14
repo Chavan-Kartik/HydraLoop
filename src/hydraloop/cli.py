@@ -76,6 +76,20 @@ def train(
 
 
 @app.command()
+def stack(
+    config: str = typer.Option(None),
+    run_id: str = typer.Option(None),
+) -> None:
+    """Train the deep defence stack and emit the ablation report (Phase 8)."""
+    from .blue.stack_run import train_defense_stack
+
+    cfg = load_config(config)
+    rid = run_id or _new_run_id()
+    out = train_defense_stack(cfg, rid)
+    typer.echo(f"Defence stack report written to {out}")
+
+
+@app.command()
 def loop(
     config: str = typer.Option(None),
     generations: int = typer.Option(0, help="Override generation count (0 = config)."),

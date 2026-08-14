@@ -1,0 +1,48 @@
+{
+  "run_id": "example_stack",
+  "ablation": [
+    {
+      "model": "tabular",
+      "pr_auc_observed": 0.4027,
+      "recall_at_fpr_observed": 0.16,
+      "pr_auc_true": 0.4851,
+      "recall_at_fpr_true": 0.1515
+    },
+    {
+      "model": "sequence",
+      "pr_auc_observed": 0.5658,
+      "recall_at_fpr_observed": 0.2,
+      "pr_auc_true": 0.763,
+      "recall_at_fpr_true": 0.4242
+    },
+    {
+      "model": "graph",
+      "pr_auc_observed": 0.31,
+      "recall_at_fpr_observed": 0.2,
+      "pr_auc_true": 0.4431,
+      "recall_at_fpr_true": 0.1818
+    },
+    {
+      "model": "narrative",
+      "pr_auc_observed": 0.4167,
+      "recall_at_fpr_observed": 0.08,
+      "pr_auc_true": 0.5689,
+      "recall_at_fpr_true": 0.0909
+    },
+    {
+      "model": "sentinel",
+      "pr_auc_observed": 0.4153,
+      "recall_at_fpr_observed": 0.0,
+      "pr_auc_true": 0.5697,
+      "recall_at_fpr_true": 0.0
+    },
+    {
+      "model": "ensemble",
+      "pr_auc_observed": 0.5197,
+      "recall_at_fpr_observed": 0.08,
+      "pr_auc_true": 0.7241,
+      "recall_at_fpr_true": 0.1818
+    }
+  ],
+  "sentinel_zeroday_solo_recall_at_fpr_1pct": 0.0
+}

@@ -1,6 +1,6 @@
 PY ?= python
 
-.PHONY: setup test lint demo twin attack train loop report api ui authenticity
+.PHONY: setup test lint demo twin attack train stack loop report api ui authenticity
 
 setup:
 	$(PY) -m pip install --upgrade pip
@@ -28,6 +28,9 @@ attack:
 
 train:
 	$(PY) -m hydraloop train
+
+stack:
+	$(PY) -m hydraloop stack
 
 loop:
 	$(PY) -m hydraloop loop

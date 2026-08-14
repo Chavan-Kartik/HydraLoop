@@ -25,11 +25,12 @@ switch ($Target) {
     "twin" { & $py -m hydraloop twin }
     "attack" { & $py -m hydraloop attack }
     "train" { & $py -m hydraloop train }
+    "stack" { & $py -m hydraloop stack }
     "loop" { & $py -m hydraloop loop }
     "report" { & $py scripts\build_reports.py }
     "api" { & $py -m hydraloop api }
     "ui" { Push-Location ui; npm install; npm run dev; Pop-Location }
     default {
-        Write-Host "Targets: setup test lint demo twin attack train loop report api ui"
+        Write-Host "Targets: setup test lint demo twin attack train stack loop report api ui"
     }
 }
