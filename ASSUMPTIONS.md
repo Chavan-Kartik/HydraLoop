@@ -15,4 +15,22 @@ Every assumed parameter must be tracked here.
 | A09 | Legitimate user arrivals have diurnal and weekly patterns | configurable | human activity is periodic | assumed | temporal sensitivity |
 | A10 | GenAI may scale attacks, but HydraLoop simulates only behavioral footprints | abstraction policy | safety constraint | design decision | not applicable |
 
+## Cost model (Phase 5 decision policy)
+
+These feed `blue/costs.py`. Every entry is swept +/-50% in the sensitivity analysis.
+
+| ID | Parameter | Value | Range | Justification | Sensitivity Plan |
+|---|---|---:|---|---|---|
+| C01 | loss_given_fraud | 1.0 | 0.5 - 1.0 | settled fraud loses close to full value | sweep |
+| C02 | false_positive_value_frac | 0.15 | 0.05 - 0.30 | blocking a good customer loses goodwill and value | sweep |
+| C03 | friction_frac (step-up) | 0.010 | 0.002 - 0.03 | step-up friction as a fraction of value | sweep |
+| C04 | legit_abandon_prob | 0.04 | 0.01 - 0.10 | good customers occasionally abandon at step-up | sweep |
+| C05 | hold_frac | 0.015 | 0.005 - 0.04 | delaying a payment carries a cost | sweep |
+| C06 | review_cost_minor | 300 | 100 - 800 | fixed operational cost of a manual review | sweep |
+| C07 | soft_warn_frac | 0.002 | 0.0005 - 0.01 | soft-warn is cheap friction | sweep |
+| C08 | block_prob_step_up | 0.60 | 0.4 - 0.8 | fraction of fraud blocked by a step-up | sweep |
+| C09 | block_prob_soft_warn | 0.20 | 0.1 - 0.4 | soft-warn deters some fraud | sweep |
+| C10 | block_prob_hold | 0.50 | 0.3 - 0.7 | a hold deters fraud during review | sweep |
+| C11 | block_prob_manual_review | 0.85 | 0.6 - 0.95 | reviewers block most true fraud | sweep |
+
 Any assumption not listed here must be added before use.
