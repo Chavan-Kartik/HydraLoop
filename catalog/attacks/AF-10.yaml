@@ -20,3 +20,13 @@ mitigation_options: [dynamic_warning, cooling_off_hold]
 risk_level: high
 validation_status: unverified_hypothetical
 harm_review: "No grooming content; escalation cadence parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "45_54", target_side: victim, balance_percentile_lo: 0.5, balance_percentile_hi: 0.9}
+  amount_policy: {type: ladder, base: balance, steps: [0.05, 0.15, 0.35, 0.6], max_fraction: 0.7}
+  timing_policy: {inter_txn_delay_mu: 8.0, inter_txn_delay_sigma: 1.2, dwell_before_cashout_h: 24.0}
+  device_policy: {reuse: victim_device, tamper: false, device_count: 1}
+  channel_mix: {weights: {a2a: 0.75, wallet: 0.15, card_not_present: 0.1}}
+  network_topology: {mule_fanout: 2, mule_fanin: 1, layering_depth: 2}
+  friction_response: {abandon_prob: 0.2, retry_after_h: 12.0, max_retries: 3}
+  resource_budget: {mule_accounts: 2, synthetic_identities: 0, devices: 1, operator_hours: 3.0}

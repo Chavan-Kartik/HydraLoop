@@ -21,3 +21,11 @@ mitigation_options: [enhanced_kyc_stepup, cooling_off_hold, device_reputation_ch
 risk_level: high
 validation_status: unverified_hypothetical
 harm_review: "No identity documents, images, or persuasion content generated."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "25_34", target_side: account}
+  amount_policy: {type: ladder, base: limit, steps: [0.05, 0.2, 0.5], max_fraction: 0.6}
+  timing_policy: {inter_txn_delay_mu: 6.0, inter_txn_delay_sigma: 1.0, dwell_before_cashout_h: 12.0}
+  device_policy: {reuse: new_device, tamper: true, device_count: 4}
+  network_topology: {mule_fanout: 2, mule_fanin: 1, layering_depth: 1}
+  resource_budget: {mule_accounts: 2, synthetic_identities: 3, devices: 4, operator_hours: 5.0}

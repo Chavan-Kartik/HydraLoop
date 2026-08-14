@@ -20,3 +20,11 @@ mitigation_options: [merchant_review, settlement_hold]
 risk_level: medium
 validation_status: unverified_hypothetical
 harm_review: "No merchant onboarding bypass modelled; profile statistics only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "35_44", target_side: account}
+  amount_policy: {type: flat, base: limit, steps: [0.2], max_fraction: 0.25}
+  timing_policy: {inter_txn_delay_mu: 5.0, inter_txn_delay_sigma: 0.5, dwell_before_cashout_h: 8.0}
+  channel_mix: {weights: {a2a: 0.0, wallet: 0.2, card_not_present: 0.8}}
+  network_topology: {mule_fanout: 1, mule_fanin: 8, layering_depth: 1}
+  resource_budget: {mule_accounts: 8, synthetic_identities: 1, devices: 4, operator_hours: 6.0}
