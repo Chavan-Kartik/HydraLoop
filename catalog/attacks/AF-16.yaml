@@ -1,0 +1,22 @@
+attack_id: AF-16
+attack_name: "Collusive merchant bust-out"
+family: merchant_abuse
+payment_surface: [merchant_acquiring, card_not_present]
+genai_role: >
+  Hypothesised collusion where a merchant builds a trusted profile then processes
+  a large fraudulent batch before disappearing. We model the trust-then-spike
+  settlement footprint only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "A trust-building period precedes a settlement spike"
+  - "The spike precedes account abandonment"
+behavioral_signals:
+  - settlement_volume_spike
+  - trust_period_duration
+  - post_spike_inactivity
+  - chargeback_lag_after_spike
+detection_hypotheses: [settlement_spike_detection, lifecycle_anomaly]
+mitigation_options: [settlement_hold, merchant_review]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No collusion playbook; settlement-lifecycle statistics only."

@@ -1,0 +1,23 @@
+attack_id: AF-01
+attack_name: "GenAI-assisted identity coherence at onboarding"
+family: synthetic_identity
+payment_surface: [account_onboarding, card_not_present]
+genai_role: >
+  Hypothesised use of generative models to produce internally consistent
+  application metadata across fields (name, address, employer, contact history)
+  so that individual coherence checks pass. We model only the statistical
+  footprint of unusually high field consistency, not any generated document.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Application-field coherence is measurable as a metadata z-score"
+  - "A subset of onboardings share reused-but-perturbed attributes"
+behavioral_signals:
+  - field_coherence_zscore
+  - attribute_reuse_across_applications
+  - onboarding_velocity_per_device
+  - contactability_gap_flag
+detection_hypotheses: [onboarding_anomaly, cross_application_linkage]
+mitigation_options: [enhanced_kyc_stepup, cooling_off_hold, device_reputation_check]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No identity documents, images, or persuasion content generated."

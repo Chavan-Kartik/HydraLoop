@@ -1,0 +1,21 @@
+attack_id: AF-23
+attack_name: "Rapid layering across rails"
+family: money_movement
+payment_surface: [account_to_account_transfer, wallet_topup]
+genai_role: >
+  Hypothesised rapid movement of value across multiple rails to obscure origin.
+  We model the layering-depth and cross-rail hop-timing footprint only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Value hops across rails within a short window"
+  - "Each hop reduces traceable linkage"
+behavioral_signals:
+  - cross_rail_hop_count
+  - hop_interval_distribution
+  - value_preservation_across_hops
+  - terminal_cashout_concentration
+detection_hypotheses: [layering_path_analysis, cross_rail_linkage]
+mitigation_options: [graph_linkage_review, cooling_off_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No layering playbook; hop-timing statistics only."

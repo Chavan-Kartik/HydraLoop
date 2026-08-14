@@ -1,0 +1,22 @@
+attack_id: AF-03
+attack_name: "Fabricated-attribute onboarding fraud"
+family: synthetic_identity
+payment_surface: [account_onboarding]
+genai_role: >
+  Hypothesised assembly of plausible but fabricated applicant attributes at
+  scale. We model the distributional signature of fabricated cohorts (clustered
+  attributes, thin genuine history), never generated identities themselves.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Fabricated cohorts cluster in attribute space"
+  - "Genuine third-party history is thin for fabricated applicants"
+behavioral_signals:
+  - attribute_cluster_density
+  - thin_file_flag
+  - shared_contact_infrastructure
+  - onboarding_time_of_day_anomaly
+detection_hypotheses: [cohort_clustering, thin_file_scoring]
+mitigation_options: [enhanced_kyc_stepup, third_party_verification]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No fabricated identities produced; cohort statistics only."

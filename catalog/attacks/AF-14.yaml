@@ -1,0 +1,30 @@
+attack_id: AF-14
+attack_name: "Transaction laundering through a front merchant"
+family: merchant_abuse
+payment_surface: [card_not_present, merchant_acquiring]
+genai_role: >
+  Hypothesised routing of unrelated illicit volume through a legitimate-looking
+  merchant. We model the fan-in of many unrelated cardholders to a single
+  beneficiary merchant plus amount-uniformity signatures only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Many unrelated cardholders pay one merchant in a tight window"
+  - "Amounts show unusual uniformity"
+behavioral_signals:
+  - unrelated_cardholder_fan_in
+  - amount_uniformity_index
+  - geo_dispersion_vs_merchant_locale
+  - settlement_timing_regularity
+detection_hypotheses: [fan_in_graph_anomaly, uniformity_detection]
+mitigation_options: [settlement_hold, merchant_review, graph_linkage_review]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "Behavioural fan-in statistics only; no laundering instructions."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "25_34", target_side: account}
+  amount_policy: {type: flat, base: limit, steps: [0.25], max_fraction: 0.3}
+  timing_policy: {inter_txn_delay_mu: 4.0, inter_txn_delay_sigma: 0.3, dwell_before_cashout_h: 6.0}
+  channel_mix: {weights: {a2a: 0.1, wallet: 0.1, card_not_present: 0.8}}
+  network_topology: {mule_fanout: 1, mule_fanin: 12, layering_depth: 2}
+  resource_budget: {mule_accounts: 12, synthetic_identities: 2, devices: 6, operator_hours: 8.0}

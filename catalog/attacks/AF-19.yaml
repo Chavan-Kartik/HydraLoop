@@ -1,0 +1,21 @@
+attack_id: AF-19
+attack_name: "BIN-range enumeration"
+family: card_testing
+payment_surface: [card_not_present]
+genai_role: >
+  Hypothesised structured enumeration across a range to find live values. We
+  model the sequential-range coverage signature only; no numbers are generated.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Attempts sweep a contiguous range in a short window"
+  - "Success density within the range is low but non-zero"
+behavioral_signals:
+  - range_coverage_density
+  - sequential_pattern_index
+  - short_window_burst
+  - low_success_density
+detection_hypotheses: [range_sweep_detection, sequence_pattern_scoring]
+mitigation_options: [rate_limit_hold, decline]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No enumeration algorithm or values; coverage statistics only."

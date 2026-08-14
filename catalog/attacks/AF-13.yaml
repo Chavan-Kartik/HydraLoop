@@ -1,0 +1,22 @@
+attack_id: AF-13
+attack_name: "Shell / ghost merchant"
+family: merchant_abuse
+payment_surface: [card_not_present, merchant_acquiring]
+genai_role: >
+  Hypothesised stand-up of merchants that exist only to process illicit volume.
+  We model the acquiring-side footprint (thin genuine footprint, atypical
+  approval-to-refund ratio) only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Merchant has thin genuine operating history"
+  - "Transaction mix is atypical for the declared category"
+behavioral_signals:
+  - merchant_tenure_days
+  - category_mix_divergence
+  - approval_to_refund_ratio
+  - repeated_cardholder_concentration
+detection_hypotheses: [merchant_profile_anomaly, concentration_analysis]
+mitigation_options: [merchant_review, settlement_hold]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No merchant onboarding bypass modelled; profile statistics only."

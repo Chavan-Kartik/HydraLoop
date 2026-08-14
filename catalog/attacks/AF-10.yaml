@@ -1,0 +1,22 @@
+attack_id: AF-10
+attack_name: "Romance and investment grooming funnel"
+family: social_engineering
+payment_surface: [account_to_account_transfer, card_not_present]
+genai_role: >
+  Hypothesised long-horizon grooming culminating in escalating victim-initiated
+  transfers. We simulate the escalation cadence and beneficiary reuse footprint
+  only, never the grooming content.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Payments escalate over days to weeks"
+  - "A small set of beneficiaries receives repeated transfers"
+behavioral_signals:
+  - escalating_amount_trend
+  - repeated_beneficiary_flag
+  - cross_session_persistence
+  - amount_relative_to_income_proxy
+detection_hypotheses: [longitudinal_escalation, beneficiary_concentration]
+mitigation_options: [dynamic_warning, cooling_off_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No grooming content; escalation cadence parameters only."

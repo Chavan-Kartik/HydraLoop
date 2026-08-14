@@ -1,0 +1,22 @@
+attack_id: AF-04
+attack_name: "First-party synthetic blend (real-plus-fabricated)"
+family: synthetic_identity
+payment_surface: [account_onboarding, card_not_present]
+genai_role: >
+  Hypothesised blending of a genuine attribute with fabricated supporting
+  attributes to defeat single-field verification. We model the mismatch
+  footprint between verifiable and unverifiable fields only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "One attribute is genuine and verifiable; others are weakly verifiable"
+  - "Blend accounts show partial verification success"
+behavioral_signals:
+  - partial_verification_pattern
+  - verifiable_vs_unverifiable_gap
+  - repeat_attribute_across_accounts
+  - low_genuine_engagement
+detection_hypotheses: [verification_gap_scoring, linkage_analysis]
+mitigation_options: [step_up_verification, graph_linkage_review]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "Behavioural mismatch statistics only; no PII synthesis."

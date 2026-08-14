@@ -1,0 +1,22 @@
+attack_id: AF-08
+attack_name: "Recovery-channel abuse enabled takeover"
+family: account_takeover
+payment_surface: [account_to_account_transfer]
+genai_role: >
+  Hypothesised abuse of account-recovery channels to gain control, represented
+  only through the metadata signature of a recent recovery event preceding a
+  high-value transfer. No recovery-bypass technique is modelled.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "A recovery or contact-detail change precedes value extraction"
+  - "The changed contact detail is used to approve the transfer"
+behavioral_signals:
+  - recent_contact_change_flag
+  - recovery_event_to_payment_latency
+  - new_device_after_recovery
+  - amount_relative_to_balance_percentile
+detection_hypotheses: [recovery_event_correlation, device_change_anomaly]
+mitigation_options: [cooling_off_hold, payee_verification_stepup]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No recovery-bypass method; correlation metadata only."

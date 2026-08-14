@@ -1,0 +1,22 @@
+attack_id: AF-12
+attack_name: "Impersonation of institution support"
+family: social_engineering
+payment_surface: [account_to_account_transfer, wallet_topup]
+genai_role: >
+  Hypothesised impersonation of trusted support to direct a victim to move funds
+  to a safe-account. We model the safe-account transfer footprint (self-to-new
+  beneficiary, full-balance sweep) only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Transfer targets a newly created beneficiary framed as safe"
+  - "Amount approaches full available balance"
+behavioral_signals:
+  - safe_account_sweep_pattern
+  - new_payee_created_minutes_before_payment
+  - full_balance_transfer_flag
+  - hesitation_events
+detection_hypotheses: [sweep_pattern_detection, payee_novelty]
+mitigation_options: [cooling_off_hold, dynamic_warning]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No impersonation scripts; transfer-pattern parameters only."

@@ -1,0 +1,31 @@
+attack_id: AF-06
+attack_name: "Post-authentication session hijack"
+family: account_takeover
+payment_surface: [account_to_account_transfer, card_not_present]
+genai_role: >
+  Hypothesised takeover of an already-authenticated session, extracting value
+  from the victim's own device context. We model the deviation from the victim's
+  behavioural baseline while device fingerprint appears familiar.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Device fingerprint matches the victim but behaviour does not"
+  - "Payee is newly added shortly before the transfer"
+behavioral_signals:
+  - behaviour_vs_baseline_zscore
+  - new_payee_created_minutes_before_payment
+  - navigation_entropy_shift
+  - amount_relative_to_balance_percentile
+detection_hypotheses: [behavioural_baseline_deviation, payee_novelty]
+mitigation_options: [payee_verification_stepup, cooling_off_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No session tokens or exploit steps; behavioural deltas only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "45_54", target_side: victim, balance_percentile_lo: 0.6, balance_percentile_hi: 0.95}
+  amount_policy: {type: flat, base: balance, steps: [0.7], max_fraction: 0.8}
+  timing_policy: {inter_txn_delay_mu: 3.0, inter_txn_delay_sigma: 0.6, dwell_before_cashout_h: 0.5}
+  device_policy: {reuse: victim_device, tamper: false, device_count: 1}
+  channel_mix: {weights: {a2a: 0.7, wallet: 0.2, card_not_present: 0.1}}
+  network_topology: {mule_fanout: 1, mule_fanin: 1, layering_depth: 1}
+  resource_budget: {mule_accounts: 1, synthetic_identities: 0, devices: 1, operator_hours: 0.5}

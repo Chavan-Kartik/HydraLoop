@@ -1,0 +1,22 @@
+attack_id: AF-24
+attack_name: "Fan-in consolidation before cash-out"
+family: money_movement
+payment_surface: [account_to_account_transfer]
+genai_role: >
+  Hypothesised consolidation of dispersed value back into a small number of
+  accounts immediately before cash-out. We model the reconvergence topology and
+  timing footprint only.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Many source accounts converge on few consolidation accounts"
+  - "Consolidation immediately precedes cash-out"
+behavioral_signals:
+  - fan_in_degree
+  - consolidation_to_cashout_latency
+  - source_account_age_spread
+  - terminal_account_concentration
+detection_hypotheses: [fan_in_graph_anomaly, reconvergence_detection]
+mitigation_options: [graph_linkage_review, cooling_off_hold, manual_review]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No consolidation instructions; reconvergence statistics only."
