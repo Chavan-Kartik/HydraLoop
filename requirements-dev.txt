@@ -1,0 +1,7 @@
+# Pinned development dependencies for HydraLoop.
+-r requirements.txt
+
+pytest==9.1.1
+pytest-cov==7.1.0
+hypothesis==6.165.7
+ruff==0.16.3
