@@ -1,26 +1,34 @@
+import json
+
 import pytest
 
-from hydraloop.red.ledger import BudgetExhausted, ResourceLedger
+from hydraloop.loop.ledger import GENESIS, GenerationLedger
 
 
-def test_allocation_within_budget_balances():
-    led = ResourceLedger()
-    led.allocate("e1", "operator_hours", 0.5, budget=2.0)
-    led.allocate("e1", "operator_hours", 0.5, budget=2.0)
-    led.allocate("e1", "mule_accounts", 2, budget=3)
-    assert led.balances()
-    assert led.totals()["operator_hours"] == 1.0
-    assert led.totals()["mule_accounts"] == 2.0
+def test_chain_links_and_reconstructs(tmp_path):
+    path = tmp_path / "ledger.jsonl"
+    led = GenerationLedger(path)
+    led.append({"generation": 1, "escape_rate": 1.0})
+    led.append({"generation": 2, "escape_rate": 0.3})
+    assert led.entries[0]["prev_hash"] == GENESIS
+    assert led.entries[1]["prev_hash"] == led.entries[0]["entry_hash"]
+
+    reloaded = GenerationLedger.load(path)  # verify() runs on load
+    assert len(reloaded.entries) == 2
+    assert reloaded.head_hash == led.head_hash
 
 
-def test_over_budget_raises():
-    led = ResourceLedger()
-    led.allocate("e1", "devices", 3, budget=3)
-    with pytest.raises(BudgetExhausted):
-        led.allocate("e1", "devices", 1, budget=3)
+def test_tamper_is_detected(tmp_path):
+    path = tmp_path / "ledger.jsonl"
+    led = GenerationLedger(path)
+    led.append({"generation": 1, "escape_rate": 1.0})
+    led.append({"generation": 2, "escape_rate": 0.3})
 
+    lines = path.read_text(encoding="utf-8").splitlines()
+    first = json.loads(lines[0])
+    first["payload"]["escape_rate"] = 0.0  # rewrite history
+    lines[0] = json.dumps(first, sort_keys=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-def test_unknown_kind_rejected():
-    led = ResourceLedger()
     with pytest.raises(ValueError):
-        led.allocate("e1", "not_a_resource", 1, budget=1)
+        GenerationLedger.load(path)
