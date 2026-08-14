@@ -1,0 +1,8 @@
+{
+  "run_id": "example_coevolution",
+  "generations": 4,
+  "escapes_closed_total": 2,
+  "rollbacks": 4,
+  "ledger_entries": 4,
+  "ledger_head": "7e11a43d1df5034fee63e3e7c00d3e9a"
+}

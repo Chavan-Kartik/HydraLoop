@@ -1,0 +1,69 @@
+{
+  "run_id": "example_coevolution",
+  "points": [
+    {
+      "generation": 1,
+      "escape_rate": 1.0,
+      "escapes": 44,
+      "candidate_archive_recall": 0.6591,
+      "incumbent_archive_recall": 0.0,
+      "promoted": true
+    },
+    {
+      "generation": 2,
+      "escape_rate": 0.2619,
+      "escapes": 11,
+      "candidate_archive_recall": 0.3256,
+      "incumbent_archive_recall": 0.686,
+      "promoted": false
+    },
+    {
+      "generation": 3,
+      "escape_rate": 0.2195,
+      "escapes": 9,
+      "candidate_archive_recall": 0.2677,
+      "incumbent_archive_recall": 0.6693,
+      "promoted": false
+    },
+    {
+      "generation": 4,
+      "escape_rate": 0.2273,
+      "escapes": 10,
+      "candidate_archive_recall": 0.3626,
+      "incumbent_archive_recall": 0.4795,
+      "promoted": false
+    }
+  ],
+  "gauntlet_log": [
+    {
+      "generation": 1,
+      "candidate": "immune-memory-retrain",
+      "promoted": true,
+      "result": "generation-1 bootstrap: no incumbent to protect"
+    },
+    {
+      "generation": 2,
+      "candidate": "fraud-starved-retrain",
+      "promoted": false,
+      "result": "REJECT: archive recall regressed 0.686 -> 0.012 (tolerance 0.02)"
+    },
+    {
+      "generation": 2,
+      "candidate": "immune-memory-retrain",
+      "promoted": false,
+      "result": "REJECT: archive recall regressed 0.686 -> 0.326 (tolerance 0.02)"
+    },
+    {
+      "generation": 3,
+      "candidate": "immune-memory-retrain",
+      "promoted": false,
+      "result": "REJECT: archive recall regressed 0.669 -> 0.268 (tolerance 0.02)"
+    },
+    {
+      "generation": 4,
+      "candidate": "immune-memory-retrain",
+      "promoted": false,
+      "result": "REJECT: archive recall regressed 0.480 -> 0.363 (tolerance 0.02)"
+    }
+  ]
+}
