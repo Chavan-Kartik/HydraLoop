@@ -47,9 +47,16 @@ python -m hydraloop attack    # execute catalog genomes in the twin
 python -m hydraloop train     # blue-team baseline + metrics
 python -m hydraloop loop      # co-evolution with the regression gauntlet
 
-# Command-center backend.
+# Command-center backend (serves REST + the arena WebSocket on :8000).
 python -m hydraloop api
+
+# Command-center UI in a second terminal (Next.js dev server on :3000).
+cd ui && npm install && npm run dev
 ```
+
+The UI renders from the live backend and falls back to a pre-seeded snapshot
+under `ui/public/seed/` when the backend is unreachable, so it demos with the
+venue wifi dead.
 
 ### Docker
 

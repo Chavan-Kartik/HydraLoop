@@ -1,0 +1,208 @@
+{
+  "run_id": "example_coevolution",
+  "events": [
+    {
+      "type": "generation_start",
+      "generation": 1,
+      "text": "Generation 1 begins",
+      "data": {
+        "n_genomes": 8
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 1,
+      "text": "Escape mode AF-21 x7",
+      "data": {
+        "cluster_id": 0,
+        "dominant_attack_id": "AF-21",
+        "dominant_genome": "4b939db82a56abf4",
+        "size": 7
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 1,
+      "text": "Escape mode AF-01 x27",
+      "data": {
+        "cluster_id": 1,
+        "dominant_attack_id": "AF-01",
+        "dominant_genome": "b5313dfaecd3cf3d",
+        "size": 27
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 1,
+      "text": "Escape mode AF-09 x1",
+      "data": {
+        "cluster_id": 2,
+        "dominant_attack_id": "AF-09",
+        "dominant_genome": "ce540372ac6a9708",
+        "size": 1
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 1,
+      "text": "Escape mode AF-01 x9",
+      "data": {
+        "cluster_id": 3,
+        "dominant_attack_id": "AF-01",
+        "dominant_genome": "3adde2ea5751d861",
+        "size": 9
+      }
+    },
+    {
+      "type": "gauntlet",
+      "generation": 1,
+      "text": "generation-1 bootstrap: no incumbent to protect",
+      "data": {
+        "candidate": "immune-memory-retrain",
+        "promoted": true,
+        "result": "generation-1 bootstrap: no incumbent to protect"
+      }
+    },
+    {
+      "type": "generation_summary",
+      "generation": 1,
+      "text": "escape_rate=1.0 promoted=True",
+      "data": {
+        "escape_rate": 1.0,
+        "escapes": 44,
+        "promoted": true,
+        "candidate_archive_recall": 0.6591
+      }
+    },
+    {
+      "type": "generation_start",
+      "generation": 2,
+      "text": "Generation 2 begins",
+      "data": {
+        "n_genomes": 16
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 2,
+      "text": "Escape mode AF-10 x11",
+      "data": {
+        "cluster_id": 0,
+        "dominant_attack_id": "AF-10",
+        "dominant_genome": "3adde2ea5751d861",
+        "size": 11
+      }
+    },
+    {
+      "type": "gauntlet",
+      "generation": 2,
+      "text": "REJECT: archive recall regressed 0.686 -> 0.012 (tolerance 0.02)",
+      "data": {
+        "candidate": "fraud-starved-retrain",
+        "promoted": false,
+        "result": "REJECT: archive recall regressed 0.686 -> 0.012 (tolerance 0.02)"
+      }
+    },
+    {
+      "type": "gauntlet",
+      "generation": 2,
+      "text": "REJECT: archive recall regressed 0.686 -> 0.326 (tolerance 0.02)",
+      "data": {
+        "candidate": "immune-memory-retrain",
+        "promoted": false,
+        "result": "REJECT: archive recall regressed 0.686 -> 0.326 (tolerance 0.02)"
+      }
+    },
+    {
+      "type": "generation_summary",
+      "generation": 2,
+      "text": "escape_rate=0.2619 promoted=False",
+      "data": {
+        "escape_rate": 0.2619,
+        "escapes": 11,
+        "promoted": false,
+        "candidate_archive_recall": 0.3256
+      }
+    },
+    {
+      "type": "generation_start",
+      "generation": 3,
+      "text": "Generation 3 begins",
+      "data": {
+        "n_genomes": 23
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 3,
+      "text": "Escape mode AF-02 x9",
+      "data": {
+        "cluster_id": 0,
+        "dominant_attack_id": "AF-02",
+        "dominant_genome": "970a62d7215686b0",
+        "size": 9
+      }
+    },
+    {
+      "type": "gauntlet",
+      "generation": 3,
+      "text": "REJECT: archive recall regressed 0.669 -> 0.268 (tolerance 0.02)",
+      "data": {
+        "candidate": "immune-memory-retrain",
+        "promoted": false,
+        "result": "REJECT: archive recall regressed 0.669 -> 0.268 (tolerance 0.02)"
+      }
+    },
+    {
+      "type": "generation_summary",
+      "generation": 3,
+      "text": "escape_rate=0.2195 promoted=False",
+      "data": {
+        "escape_rate": 0.2195,
+        "escapes": 9,
+        "promoted": false,
+        "candidate_archive_recall": 0.2677
+      }
+    },
+    {
+      "type": "generation_start",
+      "generation": 4,
+      "text": "Generation 4 begins",
+      "data": {
+        "n_genomes": 29
+      }
+    },
+    {
+      "type": "escape",
+      "generation": 4,
+      "text": "Escape mode AF-01 x10",
+      "data": {
+        "cluster_id": 0,
+        "dominant_attack_id": "AF-01",
+        "dominant_genome": "0e81a06cc0f66a41",
+        "size": 10
+      }
+    },
+    {
+      "type": "gauntlet",
+      "generation": 4,
+      "text": "REJECT: archive recall regressed 0.480 -> 0.363 (tolerance 0.02)",
+      "data": {
+        "candidate": "immune-memory-retrain",
+        "promoted": false,
+        "result": "REJECT: archive recall regressed 0.480 -> 0.363 (tolerance 0.02)"
+      }
+    },
+    {
+      "type": "generation_summary",
+      "generation": 4,
+      "text": "escape_rate=0.2273 promoted=False",
+      "data": {
+        "escape_rate": 0.2273,
+        "escapes": 10,
+        "promoted": false,
+        "candidate_archive_recall": 0.3626
+      }
+    }
+  ]
+}
