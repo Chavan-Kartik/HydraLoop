@@ -1,0 +1,150 @@
+{
+  "run_id": "example_evolve",
+  "generations": 15,
+  "roi_start": 23.7029,
+  "roi_end": 0.0,
+  "roi_collapsed": true,
+  "coverage_start": 0.0694,
+  "coverage_end": 0.3472,
+  "coverage_climbed": true,
+  "max_friction_rate": 0.0,
+  "audit_entries": 45,
+  "refusals": 0,
+  "curve": [
+    {
+      "generation": 1,
+      "best_roi": 23.7029,
+      "best_value_settled": 2360807.0,
+      "coverage": 0.0694,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 15
+    },
+    {
+      "generation": 2,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.0972,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 21
+    },
+    {
+      "generation": 3,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.1111,
+      "novelty": 1.0417,
+      "best_friction_rate": 0.0,
+      "elite_count": 24
+    },
+    {
+      "generation": 4,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.125,
+      "novelty": 1.037,
+      "best_friction_rate": 0.0,
+      "elite_count": 27
+    },
+    {
+      "generation": 5,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.1574,
+      "novelty": 1.0294,
+      "best_friction_rate": 0.0,
+      "elite_count": 34
+    },
+    {
+      "generation": 6,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.1852,
+      "novelty": 1.025,
+      "best_friction_rate": 0.0,
+      "elite_count": 40
+    },
+    {
+      "generation": 7,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.2176,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 47
+    },
+    {
+      "generation": 8,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.25,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 54
+    },
+    {
+      "generation": 9,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.2593,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 56
+    },
+    {
+      "generation": 10,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.2824,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 61
+    },
+    {
+      "generation": 11,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.3102,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 67
+    },
+    {
+      "generation": 12,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.3194,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 69
+    },
+    {
+      "generation": 13,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.3194,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 69
+    },
+    {
+      "generation": 14,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.3333,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 72
+    },
+    {
+      "generation": 15,
+      "best_roi": 0.0,
+      "best_value_settled": 0.0,
+      "coverage": 0.3472,
+      "novelty": 1.0,
+      "best_friction_rate": 0.0,
+      "elite_count": 75
+    }
+  ]
+}

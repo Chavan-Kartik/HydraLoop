@@ -105,6 +105,21 @@ def loop(
 
 
 @app.command()
+def evolve(
+    config: str = typer.Option(None),
+    generations: int = typer.Option(15, help="Co-evolution generations (Gate G4 needs 15+)."),
+    run_id: str = typer.Option(None),
+) -> None:
+    """Run red-team economics + quality-diversity search vs the live policy (Phase 9)."""
+    from .red.coevolution import run_coevolution_economics
+
+    cfg = load_config(config)
+    rid = run_id or _new_run_id()
+    out = run_coevolution_economics(cfg, rid, generations=generations)
+    typer.echo(f"Co-evolution economics written to {out}")
+
+
+@app.command()
 def demo(config: str = typer.Option("configs/experiments/demo.yaml")) -> None:
     """End-to-end smoke run: manifest, twin, attacks, baseline, short loop."""
     from .loop.orchestrator import run_coevolution
