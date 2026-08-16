@@ -2,7 +2,23 @@
 
 > "Every defence you deploy grows two new heads. Ship the defence that survives its own worst enemy."
 
-HydraLoop is a synthetic, sandboxed, co-evolutionary adversarial payment security lab.
+HydraLoop is a synthetic, sandboxed, co-evolutionary adversarial payment security lab
+for the era of **agentic commerce**.
+
+## Why now
+
+Autonomous agents are starting to make payments on people's behalf. That collapses the
+human friction fraud used to trip over and turns the adversary into software that adapts at
+machine speed. A defence validated on last year's static dataset is already stale. HydraLoop
+is a wind tunnel for agentic-payment security: it *breeds* attacks and *hardens* defences
+against them in a closed loop, then shows the attacker's return on investment collapse.
+
+## Judges start here
+
+- 3-minute walkthrough: [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- One-pager: [docs/ONE_PAGER.md](docs/ONE_PAGER.md)
+- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- Responsible AI: [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md)
 
 ## The thesis
 
@@ -26,7 +42,7 @@ not a retrain script.
 - No phishing content, deepfakes, persuasion scripts, or operational tooling generated.
 - The Red Team's output space is a constrained Attack Genome DSL, never free-form text.
 
-See [SAFETY.md](SAFETY.md) for the full abstraction policy.
+See [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md) for the full safety and abstraction policy.
 
 ## Quickstart
 
@@ -49,6 +65,8 @@ python -m hydraloop stack     # deep defence stack + ablation table
 python -m hydraloop evolve    # red economics + quality-diversity search (Gate G4)
 python -m hydraloop evaluate  # LOFO, zero-day, drift, fidelity, sensitivity tornado
 python -m hydraloop loop      # co-evolution with the regression gauntlet
+python -m hydraloop bench     # data-credibility benchmark: fidelity + TSTR/TRTS
+python -m hydraloop bench --csv path/to/real.csv   # benchmark against a real dataset
 
 # Command-center backend (serves REST + the arena WebSocket on :8000).
 python -m hydraloop api
@@ -59,7 +77,17 @@ cd ui && npm install && npm run dev
 
 The UI renders from the live backend and falls back to a pre-seeded snapshot
 under `ui/public/seed/` when the backend is unreachable, so it demos with the
-venue wifi dead.
+venue wifi dead. Six screens: Arena (live loop), Threat Board (the abstracted
+catalog), Attack Genome Lineage (mutation trail with plain-English briefs),
+Investigation (SHAP reason codes plus counterfactual), Scoreboard (metrics),
+and Governance (hash-chained audit trail with a live verify button). A "Judge
+Demo Mode" button narrates the loop beat by beat.
+
+Regenerate the offline seed snapshots after changing projections:
+
+```bash
+python scripts/seed_ui.py
+```
 
 ### Docker
 
@@ -87,7 +115,7 @@ src/hydraloop/
   loop/         orchestrator, immune memory, regression gauntlet
   evaluation/   metrics, fidelity, generalisation, sensitivity
   api/          FastAPI + WebSocket command-center backend
-catalog/attacks/  24 documented threat scenarios (YAML)
+catalog/attacks/  28 documented threat scenarios (YAML) across 7 families
 configs/          seeds and experiment configs
 ui/               Next.js command center
 reports/runs/     per-run artefacts (git-ignored; exemplars in reports/examples/)
@@ -95,8 +123,12 @@ reports/runs/     per-run artefacts (git-ignored; exemplars in reports/examples/
 
 ## Documents
 
-- [SAFETY.md](SAFETY.md) - abstraction policy and scope containment
-- [ASSUMPTIONS.md](ASSUMPTIONS.md) - assumptions register with sensitivity plans
-- [DATA_CARD.md](DATA_CARD.md), [MODEL_CARD.md](MODEL_CARD.md)
-- [LIMITATIONS.md](LIMITATIONS.md)
+- [docs/ONE_PAGER.md](docs/ONE_PAGER.md) - the pitch on one page
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - system diagram and data flow
+- [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) - the 3-minute stage walkthrough
+- [docs/SUBMISSION.md](docs/SUBMISSION.md) - the full write-up with results
+- [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md) - safety, abstraction policy, and governance
+- [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md) - assumptions register with sensitivity plans
+- [docs/DATA_CARD.md](docs/DATA_CARD.md), [docs/MODEL_CARD.md](docs/MODEL_CARD.md)
+- [docs/LIMITATIONS.md](docs/LIMITATIONS.md)
 - [docs/EDGE_CASES.md](docs/EDGE_CASES.md)
