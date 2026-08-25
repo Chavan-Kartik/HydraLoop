@@ -438,13 +438,3 @@ def iter_harden(text: str) -> Iterator[dict[str, Any]]:
             "entry_hash": entry["entry_hash"],
         },
     }
-
-
-def run_harden(text: str) -> dict[str, Any]:
-    result: dict[str, Any] | None = None
-    for event in iter_harden(text):
-        if event.get("type") == "done":
-            result = event["result"]
-    if result is None:
-        raise RuntimeError("harden cycle produced no result")
-    return result

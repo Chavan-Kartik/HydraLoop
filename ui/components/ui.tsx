@@ -11,8 +11,6 @@
  * surfaces, one accent colour, and motion only where it carries information.
  */
 
-import { motion } from "framer-motion";
-
 /* -------------------------------------------------------------------------- */
 /*  Surfaces                                                                   */
 /* -------------------------------------------------------------------------- */
@@ -128,71 +126,10 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * A figure and its caption. Monospaced and tabular so columns of these line up
- * and do not jitter while a run streams.
+ * A number rendered for a console: monospaced and tabular, so columns of these
+ * line up and do not jitter as values stream in.
  */
-export function Metric({
-  label,
-  value,
-  hint,
-  tone = "default",
-}: {
-  label: string;
-  value: React.ReactNode;
-  hint?: string;
-  tone?: "default" | "good" | "bad" | "warn";
-}) {
-  const toneClass = {
-    default: "text-ink",
-    good: "text-success-700",
-    bad: "text-danger-700",
-    warn: "text-warn-700",
-  }[tone];
-  return (
-    <div className="min-w-0">
-      <div className="label truncate">{label}</div>
-      <div className={`mt-0.5 font-mono text-lg font-semibold tabular-nums ${toneClass}`}>
-        {value}
-      </div>
-      {hint && <div className="mt-0.5 truncate text-2xs text-ink-ghost">{hint}</div>}
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Motion                                                                     */
-/* -------------------------------------------------------------------------- */
-
-/** A short opacity fade. No translation, so nothing shifts under the cursor. */
-export function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.18, delay, ease: "easeOut" }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/**
- * Renders a figure immediately.
- *
- * Kept as a component only so call sites do not have to change. It used to
- * animate from zero over about a second, which meant that for that second the
- * console displayed a number that was simply not the measurement.
- */
-export function AnimatedNumber({
+export function Figure({
   value,
   format,
   className = "",

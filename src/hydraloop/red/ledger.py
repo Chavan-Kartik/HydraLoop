@@ -19,14 +19,6 @@ class BudgetExhausted(Exception):
 
 
 @dataclass
-class EpisodeBudget:
-    mule_accounts: int
-    synthetic_identities: int
-    devices: int
-    operator_hours: float
-
-
-@dataclass
 class ResourceLedger:
     entries: list[dict] = field(default_factory=list)
     _spent: dict[tuple[str, str], float] = field(default_factory=dict)

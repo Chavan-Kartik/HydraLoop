@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { ScanSearch, AlertTriangle, CheckCircle2, GitCompareArrows } from "lucide-react";
 import { getInvestigations, getLabLatest, InvestigationCase, latestRunId } from "@/lib/api";
 import {
-  AnimatedNumber,
+  Figure,
   ARROW,
   Badge,
   ErrorBox,
@@ -131,7 +131,7 @@ function CaseDetail({ c }: { c: InvestigationCase }) {
           <div>
             <div className="font-mono text-xs text-ink-ghost">{c.txn_id}</div>
             <div className={`font-mono text-4xl font-bold tabular-nums ${hot ? "text-red" : "text-blue"}`}>
-              <AnimatedNumber value={c.risk_score} format={(n) => n.toFixed(3)} />
+              <Figure value={c.risk_score} format={(n) => n.toFixed(3)} />
             </div>
             <SectionLabel>risk score</SectionLabel>
           </div>

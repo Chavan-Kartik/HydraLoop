@@ -15,8 +15,12 @@ def test_transfer_matrix_is_square_and_exposes_cells(small_config):
     assert n >= 2
     assert len(result["matrix"]) == n
     assert all(len(row) == n for row in result["matrix"])
-    # weak_cells is a list (possibly empty) of off-diagonal low-transfer entries.
-    assert isinstance(result["weak_cells"], list)
+    # weak_cells calls out off-diagonal pairs that transferred poorly, so every
+    # entry must name two different known families and sit under the threshold.
+    for cell in result["weak_cells"]:
+        assert cell["train"] != cell["test"]
+        assert {cell["train"], cell["test"]} <= set(result["families"])
+        assert cell["recall"] < 0.3
 
 
 def test_zeroday_split_reports_two_numbers(small_config):
@@ -32,4 +36,5 @@ def test_zeroday_split_reports_two_numbers(small_config):
     # Use one family as a stand-in "unseen" holdout for the split mechanics.
     holdout = list(family_frauds.values())[0]
     result = zeroday_split(detector.score, sentinel.predict_proba, val, holdout)
-    assert "supervised_recall" in result and "sentinel_recall" in result
+    for key in ("supervised_recall", "sentinel_recall"):
+        assert 0.0 <= result[key] <= 1.0

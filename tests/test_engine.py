@@ -1,5 +1,5 @@
 from hydraloop.twin.run import build_engine, generate_legit_traffic, legit_session_specs
-from hydraloop.twin.schema import EventType
+from hydraloop.twin.schema import validate_event_row
 
 
 def _run(cfg, target=200):
@@ -21,17 +21,17 @@ def test_no_capture_without_approval(small_config):
             assert t["approved"] is True
 
 
-def test_events_have_valid_types(small_config):
+def test_every_emitted_event_satisfies_the_schema(small_config):
     result = _run(small_config)
-    valid = {e.value for e in EventType}
-    assert all(e["event_type"] in valid for e in result.events)
+    assert result.events
+    for event in result.events:
+        validate_event_row(event)
 
 
-def test_horizon_censoring(small_config):
+def test_censoring_flags_exactly_the_events_past_the_horizon(small_config):
     result = _run(small_config)
-    # Some settlements/disputes fall beyond the horizon and are flagged censored.
-    censored = [e for e in result.events if e["censored"]]
-    assert isinstance(censored, list)  # may be empty for tiny runs, but must not raise
+    for event in result.events:
+        assert event["censored"] == (event["ts"] > result.horizon_s)
 
 
 def test_generate_writes_artifacts(tmp_path, small_config, monkeypatch):

@@ -21,7 +21,7 @@ import {
   getRuns,
 } from "@/lib/api";
 import {
-  AnimatedNumber,
+  Figure,
   Badge,
   Empty,
   ErrorBox,
@@ -418,7 +418,7 @@ function StatCard({
         <span className={`grid h-9 w-9 place-items-center rounded ${bg} ${color}`}>{icon}</span>
       </div>
       <div className={`mt-2 font-mono text-4xl font-bold tabular-nums ${color}`}>
-        <AnimatedNumber value={value} />
+        <Figure value={value} />
       </div>
     </Card>
   );

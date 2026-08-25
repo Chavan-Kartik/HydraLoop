@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { TrendingDown, ShieldCheck, Layers, RotateCcw, Target } from "lucide-react";
 import { getKpis, Kpis, latestRunId } from "@/lib/api";
-import { AnimatedNumber, ARROW } from "./ui";
+import { Figure, ARROW } from "./ui";
 
 type Cell = {
   label: string;
@@ -23,11 +23,11 @@ const CELLS: Cell[] = [
       k?.escape_rate_end !== undefined ? (
         <span className="flex items-baseline gap-1.5">
           <span className="text-ink-ghost">
-            <AnimatedNumber value={(k.escape_rate_start ?? 0) * 100} format={pctFmt} />
+            <Figure value={(k.escape_rate_start ?? 0) * 100} format={pctFmt} />
           </span>
           <span className="text-ink-ghost">{ARROW}</span>
           <span className="text-red">
-            <AnimatedNumber value={(k.escape_rate_end ?? 0) * 100} format={pctFmt} />
+            <Figure value={(k.escape_rate_end ?? 0) * 100} format={pctFmt} />
           </span>
         </span>
       ) : (
@@ -42,11 +42,11 @@ const CELLS: Cell[] = [
       k?.attacker_roi_start !== undefined ? (
         <span className="flex items-baseline gap-1.5">
           <span className="text-ink-ghost">
-            <AnimatedNumber value={k.attacker_roi_start ?? 0} format={(n) => `${n.toFixed(1)}x`} />
+            <Figure value={k.attacker_roi_start ?? 0} format={(n) => `${n.toFixed(1)}x`} />
           </span>
           <span className="text-ink-ghost">{ARROW}</span>
           <span className="text-accent-700">
-            <AnimatedNumber value={k.attacker_roi_end ?? 0} format={(n) => `${n.toFixed(1)}x`} />
+            <Figure value={k.attacker_roi_end ?? 0} format={(n) => `${n.toFixed(1)}x`} />
           </span>
         </span>
       ) : (
@@ -60,7 +60,7 @@ const CELLS: Cell[] = [
     render: (k) =>
       k?.best_archive_recall !== undefined ? (
         <span className="text-accent-500">
-          <AnimatedNumber value={(k.best_archive_recall ?? 0) * 100} format={pctFmt} />
+          <Figure value={(k.best_archive_recall ?? 0) * 100} format={pctFmt} />
         </span>
       ) : (
         "-"
@@ -70,13 +70,13 @@ const CELLS: Cell[] = [
     label: "Rollbacks blocked",
     icon: RotateCcw,
     accent: "text-ink",
-    render: (k) => <AnimatedNumber value={k?.rollbacks ?? 0} />,
+    render: (k) => <Figure value={k?.rollbacks ?? 0} />,
   },
   {
     label: "Generations",
     icon: Layers,
     accent: "text-ink",
-    render: (k) => <AnimatedNumber value={k?.generations ?? 0} />,
+    render: (k) => <Figure value={k?.generations ?? 0} />,
   },
 ];
 
