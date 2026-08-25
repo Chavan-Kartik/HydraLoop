@@ -56,7 +56,12 @@ function unreachableBackendHint(): string {
     typeof window !== "undefined" &&
     ["localhost", "127.0.0.1"].includes(window.location.hostname);
   if (local) {
-    return "The API is not running. In a second terminal: activate .venv, then run python -m hydraloop api";
+    return (
+      "The Lab could not reach the API. Usually this is either (1) the API is not running, or " +
+      "(2) the browser blocked the request because the UI is on a different localhost port. " +
+      "Check the UI URL port in the address bar, then open http://127.0.0.1:8000/api/health in a new tab. " +
+      "If health fails, start the API in a second terminal: activate .venv, then run python -m hydraloop api."
+    );
   }
   return (
     "This deployment has no live backend attached, so the pipeline cannot run here. " +

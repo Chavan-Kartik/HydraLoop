@@ -61,7 +61,7 @@ invalid, so the generator cannot emit anything outside the abstraction policy.
 
 Each generation is written to an append-only, hash-chained ledger. Every entry embeds the
 previous entry's digest, so any edit to run history is detectable on the next verification. The
-Governance screen recomputes the chain live and reports a break if one exists. The
+Audit screen recomputes the chain live and reports a break if one exists. The
 `run_manifest.json` records the config hash so results trace back to the exact configuration.
 
 ## Human oversight of the defence

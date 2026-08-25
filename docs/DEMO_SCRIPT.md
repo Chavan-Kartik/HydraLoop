@@ -19,33 +19,33 @@ snapshot and an "offline" badge; the demo still works.
 
 ## Beat 1 - the premise (30s)
 
-On the **Arena** screen, click **JUDGE DEMO MODE**. Read the first caption aloud: autonomous
+On the **Arena** screen, click **Caption walkthrough**. Read the first caption aloud: autonomous
 agents now initiate payments, so fraud becomes an adaptive, machine-speed adversary. Point at
 the KPI bar: escape rate and attacker ROI are the two numbers that matter, and both should fall.
 
 ## Beat 2 - the loop runs (45s)
 
-Let demo mode advance, or press **RUN CO-EVOLUTION** for a live run. Narrate: the red team
+Let the caption walkthrough advance, or press **Start live loop** for a live run. Narrate: the red team
 escapes through specific modes (call them out from the ticker), the blue team retrains from
 immune memory, and the **regression gauntlet** blocks a model that would have regressed. That
 rollback is the point: we never ship a weaker defence.
 
 ## Beat 3 - the attack, in plain English (30s)
 
-Open **Threat Board**, filter to **Agentic Commerce**. These four scenarios model
+Open **Threats**, filter to **Agentic Commerce**. These four scenarios model
 agent-initiated fraud: mandate drift, checkout takeover, agent-swarm probing, destination
 redirection - all behavioural-metadata-only, no recipes. Open **Lineage**, click a node, and
 read the one-paragraph brief so judges see the attack described in words, not just genes.
 
 ## Beat 4 - the defence is explainable (20s)
 
-Open **Investigation**. Pick a flagged transaction. Show the SHAP reason codes and the
+Open **Cases**. Pick a flagged transaction. Show the SHAP reason codes and the
 counterfactual: "if the payee were not new, risk drops by N points." This is what an analyst
 would act on.
 
 ## Beat 5 - it is honest (25s)
 
-Open **Governance**. The run history is a hash chain. Click **Verify chain**: green. Say that
+Open **Audit**. The run history is a hash chain. Click **Verify chain**: green. Say that
 any edit to history would break the chain on the next verification. Then mention the data
 credibility benchmark (`python -m hydraloop bench`) that reports discriminator AUC and TSTR /
 TRTS against a shifted or real reference, so we measure fidelity instead of asserting it.

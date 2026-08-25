@@ -33,10 +33,11 @@ security. It has three parts locked in a closed loop.
 
 ## What you can see in three minutes
 
-Arena (the loop running live), Threat Board (28 abstracted scenarios across 7 families),
-Attack Genome Lineage (the mutation trail with plain-English briefs), Investigation (SHAP
-reason codes plus a counterfactual), Scoreboard (escape rate and recall by generation), and
-Governance (verify the hash chain on stage).
+Lab (type any threat description and watch Identify to Detect run step by step),
+Arena (the loop running live), Threats (28 abstracted scenarios across 7 families),
+Lineage (the mutation trail with plain-English briefs), Cases (SHAP reason codes plus a
+counterfactual), Metrics (escape rate and recall by generation), and Audit
+(verify the hash chain on stage).
 
 ## Results to point at
 
