@@ -38,6 +38,7 @@ from ..paths import REPORTS_DIR
 from ..red.discover import discover_threat
 from ..red.dsl.genome import Genome, genome_from_template
 from ..red.holdout import is_holdout
+from ..red.llm import request_path_client
 from ..red.mixer import build_attack_specs
 from ..twin.population import SECONDS_PER_DAY
 from ..twin.run import build_engine, legit_session_specs
@@ -154,7 +155,7 @@ def iter_harden(text: str) -> Iterator[dict[str, Any]]:
         raise ValueError("describe the threat in a short paragraph (behaviour only)")
 
     rng = np.random.default_rng(SEED_BASELINE)
-    disc = discover_threat(text, rng, llm=None)
+    disc = discover_threat(text, rng, llm=request_path_client())
     new_genome = _genome_from_discovery(disc)
     known = _known_genomes(disc["family"])
 

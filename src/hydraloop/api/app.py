@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
+from ..red.llm import request_path_client
 from . import harden as harden_module
 from . import lab as lab_module
 from . import ledger_source as src
@@ -85,7 +86,18 @@ def root() -> str:
 @app.get("/api/health")
 def health() -> dict:
     runs = src.list_runs()
-    return {"status": "ok", "runs": len(runs)}
+    client = request_path_client()
+    return {
+        "status": "ok",
+        "runs": len(runs),
+        # Whether Identify will use a model or the keyword mapper on this
+        # deployment. Reports configuration, not reachability: a wrong key still
+        # reads as configured until the first call fails and the guard trips.
+        "llm": {
+            "configured": client is not None,
+            "degraded": bool(getattr(client, "tripped", False)),
+        },
+    }
 
 
 @app.get("/api/runs")

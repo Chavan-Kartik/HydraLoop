@@ -35,6 +35,43 @@ Because the defence policy is live inside the twin, a step-up challenge actually
 attacker's success probability in-simulation. The loop is a genuine adversarial environment,
 not a retrain script.
 
+## The generative red team
+
+Two places can be driven by a language model: the strategist that proposes the
+next genome inside the co-evolution loop, and the Identify step that turns a
+plain-English threat description into a simulatable attack.
+
+Neither ever asks a model for attack content. The prompt requests bounded
+numeric parameters and behavioural signal names as JSON, and the reply passes
+three tiers before it can reach the twin:
+
+1. **Strict** - a complete, valid genome is accepted verbatim.
+2. **Repair** - a partial or out-of-bounds proposal is merged onto the parent,
+   clamped to the DSL's hard bounds, then validated.
+3. **Refuse** - anything still invalid is logged as a refusal and the
+   deterministic planner runs instead.
+
+The Attack Genome DSL is the guardrail. A model can strengthen the search; it
+cannot push an out-of-policy attack through.
+
+**It is off by default.** Unconfigured, the lab uses a deterministic planner and
+a keyword mapper, so everything runs offline with no API key and no network. To
+enable a model:
+
+```bash
+HYDRALOOP_LLM_PROVIDER=openai     # or: ollama, none (default)
+HYDRALOOP_LLM_BASE_URL=https://api.groq.com/openai/v1
+HYDRALOOP_LLM_MODEL=llama-3.3-70b-versatile
+HYDRALOOP_LLM_API_KEY=...
+HYDRALOOP_LLM_TIMEOUT=10          # seconds, optional
+```
+
+`openai` speaks to any OpenAI-compatible `/chat/completions` host; `ollama`
+targets a local server. `/api/health` reports whether a model is configured, and
+the Lab's Identify step names which mapper produced each result, so it is always
+visible which path ran. A provider that stops answering trips a breaker after
+three consecutive failures and the run falls back rather than stalling.
+
 ## Safety and scope
 
 - Synthetic data only; no real cardholder data or PII.

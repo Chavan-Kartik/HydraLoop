@@ -19,6 +19,7 @@ from ..blue.features import MODEL_FEATURES, feature_matrix, mature_mask
 from ..config import Config, SimulationConfig
 from ..red.discover import discover_threat
 from ..red.dsl.genome import Genome
+from ..red.llm import request_path_client
 from ..red.mixer import build_attack_specs
 from ..twin.population import SECONDS_PER_DAY
 from ..twin.run import build_engine, legit_session_specs
@@ -37,6 +38,14 @@ PRESETS: dict[str, str] = {
         "A victim is talked into sending authorised push payments to novel payees, "
         "then funds fan out through a short mule chain."
     ),
+}
+
+
+# Shown verbatim in the Identify step, so these name what each path is rather
+# than exposing the internal method key.
+_MAPPER_LABEL = {
+    "llm": "a language model, then clamped to the genome schema",
+    "fallback": "the deterministic keyword mapper",
 }
 
 
@@ -174,14 +183,14 @@ def iter_lab(text: str) -> Iterator[dict[str, Any]]:
     rng = np.random.default_rng(11)
 
     yield {"type": "status", "phase": "identify", "message": "Mapping the description onto a catalog family."}
-    disc = discover_threat(text, rng, llm=None)
+    disc = discover_threat(text, rng, llm=request_path_client())
     genome = _genome_from_discovery(disc)
     identify = {
         "id": "identify",
         "title": "1 · Identify",
         "ok": True,
         "detail": (
-            f"Mapped to family '{disc['family']}' via {disc['method']} mapper. "
+            f"Mapped to family '{disc['family']}' by {_MAPPER_LABEL.get(disc['method'], disc['method'])}. "
             f"Signals: {', '.join(disc['behavioral_signals'])}."
         ),
     }

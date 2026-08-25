@@ -21,9 +21,11 @@ devices, amounts, how the money moves. Describe behaviour, not a method. For exa
 > under that limit, with no human pause between orders.
 
 Press **Run Identify → Detect** and watch the five steps on the left. Identify names a family
-and the signals it matched. Generate clamps your sentence into a schema-valid genome, which you
-can read in the panel on the right. Simulate emits transactions from the twin. Detect scores
-them, and the counters show how many attack transactions were caught against how many escaped.
+and the signals it matched, and says outright whether a language model or the deterministic
+keyword mapper made that call, so you always know which one you are looking at. Generate clamps
+your sentence into a schema-valid genome, which you can read in the panel on the right. Simulate
+emits transactions from the twin. Detect scores them, and the counters show how many attack
+transactions were caught against how many escaped.
 
 Now click any row in **Scored traffic**. The Investigation pane gives you SHAP reason codes for
 that one decision, each feature's contribution signed and ranked. Where a counterfactual
@@ -67,8 +69,10 @@ investigations from the most recent episode.
 
 These are the questions we would ask, so the answers are all reachable from the UI.
 
-- Type deliberate nonsense, or an actual how-to. The output space is a domain-specific language,
-  not text, so it clamps to a schema-valid genome or refuses. It will not write you an attack.
+- Type deliberate nonsense, or an actual how-to. The output space is a domain-specific language
+  rather than text, so whatever you write gets clamped into a schema-valid genome and it will
+  never write you an attack. Text matching no known family is mapped to a default one rather
+  than rejected, and the Identify caption always names which mapper made the call.
 - Check the arithmetic. **Caught** plus **Escaped** should equal **Attack txns** exactly, and
   the split is the risk score against a stated 0.45 threshold, which you can check row by row
   in the scored traffic table.
