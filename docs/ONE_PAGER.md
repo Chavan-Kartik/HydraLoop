@@ -37,7 +37,7 @@ Lab (type any threat description and watch Identify to Detect run step by step),
 Arena (the loop running live), Threats (28 abstracted scenarios across 7 families),
 Lineage (the mutation trail with plain-English briefs), Cases (SHAP reason codes plus a
 counterfactual), Metrics (escape rate and recall by generation), and Audit
-(verify the hash chain on stage).
+(verify the hash chain yourself).
 
 ## Results to point at
 

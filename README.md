@@ -15,7 +15,7 @@ against them in a closed loop, then shows the attacker's return on investment co
 
 ## Judges start here
 
-- 3-minute walkthrough: [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- 3-minute walkthrough: [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)
 - One-pager: [docs/ONE_PAGER.md](docs/ONE_PAGER.md)
 - Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Responsible AI: [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md)
@@ -148,7 +148,7 @@ reports/runs/     per-run artefacts (git-ignored; exemplars in reports/examples/
 
 - [docs/ONE_PAGER.md](docs/ONE_PAGER.md) - the pitch on one page
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - system diagram and data flow
-- [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) - the 3-minute stage walkthrough
+- [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) - a self-guided 3-minute tour of the running app
 - [docs/SUBMISSION.md](docs/SUBMISSION.md) - the full write-up with results
 - [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md) - safety, abstraction policy, and governance
 - [docs/ASSUMPTIONS.md](docs/ASSUMPTIONS.md) - assumptions register with sensitivity plans
