@@ -1,0 +1,45 @@
+{
+  "run_id": "example_coevolution",
+  "verified": true,
+  "break_at": null,
+  "head_hash": "7e11a43d1df5034fee63e3e7c00d3e9a",
+  "length": 4,
+  "entries": [
+    {
+      "generation": 1,
+      "entry_hash": "ec007b16b1747fbac6de27377b45a8f1",
+      "prev_hash": "00000000000000000000000000000000",
+      "promoted": true,
+      "escape_rate": 1.0,
+      "config_hash": "cf4d3bb040eb0abe35a4a910d2f42bec",
+      "link_ok": true
+    },
+    {
+      "generation": 2,
+      "entry_hash": "1ce3aad8be7c1573a6cb98c740fc27ce",
+      "prev_hash": "ec007b16b1747fbac6de27377b45a8f1",
+      "promoted": false,
+      "escape_rate": 0.2619,
+      "config_hash": "cf4d3bb040eb0abe35a4a910d2f42bec",
+      "link_ok": true
+    },
+    {
+      "generation": 3,
+      "entry_hash": "971ed84ed97f8c5dba8f300230104704",
+      "prev_hash": "1ce3aad8be7c1573a6cb98c740fc27ce",
+      "promoted": false,
+      "escape_rate": 0.2195,
+      "config_hash": "cf4d3bb040eb0abe35a4a910d2f42bec",
+      "link_ok": true
+    },
+    {
+      "generation": 4,
+      "entry_hash": "7e11a43d1df5034fee63e3e7c00d3e9a",
+      "prev_hash": "971ed84ed97f8c5dba8f300230104704",
+      "promoted": false,
+      "escape_rate": 0.2273,
+      "config_hash": "cf4d3bb040eb0abe35a4a910d2f42bec",
+      "link_ok": true
+    }
+  ]
+}

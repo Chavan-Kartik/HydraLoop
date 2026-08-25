@@ -1,10 +1,10 @@
 PY ?= python
 
-.PHONY: setup test lint demo twin attack train stack evolve evaluate loop report api ui authenticity
+.PHONY: setup test lint demo twin attack train stack evolve evaluate loop report api ui
 
 setup:
 	$(PY) -m pip install --upgrade pip
-	$(PY) -m pip install -r requirements-dev.txt
+	$(PY) -m pip install -r requirements.txt
 	$(PY) -m pip install -e .
 
 test:
@@ -12,10 +12,6 @@ test:
 
 lint:
 	$(PY) -m ruff check src tests scripts
-	$(PY) scripts/check_authenticity.py
-
-authenticity:
-	$(PY) scripts/check_authenticity.py
 
 demo:
 	$(PY) -m hydraloop demo

@@ -4,9 +4,9 @@ from hydraloop.catalog import load_catalog
 from hydraloop.red.dsl import FAMILIES, genome_from_template, render_brief
 
 
-def test_catalog_has_24_scenarios():
+def test_catalog_has_28_scenarios():
     scenarios = load_catalog()
-    assert len(scenarios) == 24
+    assert len(scenarios) == 28
 
 
 def test_all_families_have_four_scenarios():

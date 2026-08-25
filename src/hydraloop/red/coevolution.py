@@ -22,7 +22,9 @@ from ..paths import run_dir
 from ..twin.run import build_engine, legit_session_specs
 from .bandit import optimise_strategy
 from .dsl.genome import Genome, genome_from_template
+from .dsl.render import render_brief
 from .economics import FitnessWeights, evaluate_genome, fitness
+from .llm import OllamaClient, make_llm_client
 from .mapelites import MapElitesArchive, run_map_elites
 from .strategist import Strategist
 
@@ -55,7 +57,7 @@ def _build_policy(cfg: Config, legit_df: pd.DataFrame, fraud_accum: list[pd.Data
 
 
 def _run_generation(cfg, policy, seeds, strategist, rng, weights,
-                    qd_iterations, n_episodes, bandit_rounds, archive):
+                    qd_iterations, n_episodes, bandit_rounds, archive, generation):
     collected: list[pd.DataFrame] = []
 
     def evaluate(genome: Genome) -> float:
@@ -64,7 +66,13 @@ def _run_generation(cfg, policy, seeds, strategist, rng, weights,
             collected.append(tx[tx["is_fraud"]])
         return fitness(outcome, weights)
 
-    gen_seeds = seeds + [strategist.propose(rng.choice(seeds)) for _ in range(3)]
+    # The strategist proposes new genomes each generation; when an LLM is wired in
+    # these are model-authored (schema-validated), otherwise deterministic.
+    proposals = [
+        strategist.propose(rng.choice(seeds), {"generation": generation})
+        for _ in range(3)
+    ]
+    gen_seeds = seeds + proposals
     archive = run_map_elites(gen_seeds, evaluate, qd_iterations, rng, archive=archive)
 
     elites = sorted(archive.cells.values(), key=lambda e: e.fitness, reverse=True)[:8]
@@ -75,7 +83,46 @@ def _run_generation(cfg, policy, seeds, strategist, rng, weights,
             bandit_rounds,
             rng,
         )
-    return archive, elites, collected
+    return archive, elites, collected, proposals
+
+
+def _strategist_report(strategist: Strategist, proposals: list[Genome], provider: str,
+                       model: str, available: bool) -> dict:
+    """Project the strategist audit into a UI-friendly, judge-legible record."""
+    entries = [
+        {"accepted": e.accepted, "reason": e.reason, "genome_id": e.genome_id, "family": e.family}
+        for e in strategist.audit_log
+    ]
+    # Join on genome_id, never on position: the audit log accumulates across all
+    # generations and also records refusals, which carry no genome, so zipping it
+    # against one generation's proposals would attach the wrong reason to a genome.
+    by_id = {g.genome_id: g for g in proposals}
+    samples = []
+    for entry in strategist.audit_log:
+        if not (entry.accepted and "llm" in entry.reason):
+            continue
+        genome = by_id.get(entry.genome_id)
+        if genome is None:
+            continue
+        samples.append(
+            {
+                "genome_id": genome.genome_id,
+                "family": genome.family,
+                "reason": entry.reason,
+                "brief": render_brief(genome),
+            }
+        )
+    return {
+        "provider": provider,
+        "model": model if provider != "none" else None,
+        "available": available,
+        "proposals": len(strategist.audit_log),
+        "accepted": len(strategist.accepted()),
+        "refused": len(strategist.refusals()),
+        "llm_authored": len(samples),
+        "samples": samples[:6],
+        "entries": entries,
+    }
 
 
 def run_coevolution_economics(
@@ -85,11 +132,20 @@ def run_coevolution_economics(
     qd_iterations: int = 24,
     n_episodes: int = 30,
     bandit_rounds: int = 40,
+    llm_provider: str = "none",
+    llm_model: str = "llama3.2",
+    llm_base_url: str = "http://localhost:11434",
 ) -> Path:
     out = run_dir(run_id)
     rng = np.random.default_rng(cfg.simulation.seed)
     weights = FitnessWeights()
-    strategist = Strategist(rng=rng)
+
+    llm_client = make_llm_client(llm_provider, llm_model, llm_base_url)
+    llm_available = bool(llm_client) and (
+        llm_client.available() if isinstance(llm_client, OllamaClient) else True
+    )
+    strategist = Strategist(rng=rng, llm=llm_client)
+    all_proposals: list[Genome] = []
 
     legit_df = _initial_legit(cfg)
     fraud_accum: list[pd.DataFrame] = []
@@ -101,10 +157,11 @@ def run_coevolution_economics(
     for g in range(1, generations + 1):
         # Blue hardens: retrain on legit plus every attack discovered so far.
         policy = _build_policy(cfg, legit_df, fraud_accum)
-        archive, elites, collected = _run_generation(
+        archive, elites, collected, proposals = _run_generation(
             cfg, policy, base_seeds + seeds, strategist, rng, weights,
-            qd_iterations, n_episodes, bandit_rounds, archive,
+            qd_iterations, n_episodes, bandit_rounds, archive, g,
         )
+        all_proposals.extend(proposals)
 
         best = archive.best()
         best_outcome, _ = evaluate_genome(cfg, best.genome, policy, n_episodes)
@@ -125,6 +182,13 @@ def run_coevolution_economics(
             fraud_accum.append(pd.concat(collected, ignore_index=True))
         seeds = [e.genome for e in elites] or seeds
 
+    strategist_report = _strategist_report(
+        strategist, all_proposals, llm_provider, llm_model, llm_available
+    )
+    (out / "strategist_audit.json").write_text(
+        json.dumps(strategist_report, indent=2), encoding="utf-8"
+    )
+
     roi0 = curve[0]["best_roi"]
     roin = curve[-1]["best_roi"]
     summary = {
@@ -139,6 +203,14 @@ def run_coevolution_economics(
         "max_friction_rate": max(c["best_friction_rate"] for c in curve),
         "audit_entries": len(strategist.audit_log),
         "refusals": len(strategist.refusals()),
+        "strategist": {
+            "provider": strategist_report["provider"],
+            "model": strategist_report["model"],
+            "available": strategist_report["available"],
+            "accepted": strategist_report["accepted"],
+            "refused": strategist_report["refused"],
+            "llm_authored": strategist_report["llm_authored"],
+        },
         "curve": curve,
     }
     (out / "coevolution_economics.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")

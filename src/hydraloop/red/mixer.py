@@ -53,7 +53,12 @@ def build_attack_specs(
     while len(specs) < n_fraud_target and genomes:
         genome = genomes[episode % len(genomes)]
         holder = _pick_victim(engine, genome, gen)
-        start_ts = float(gen.uniform(0.0, max(1.0, horizon_s * 0.8)))
+        # Across the whole horizon, not the first 80% of it. Confining attack starts
+        # to an early window leaves the tail of the horizon fraud-free, and since the
+        # train/test split is temporal that hands the test set little or no fraud to
+        # detect. Episodes that run past the horizon are marked censored by the engine
+        # rather than dropped, which is what a real data pull looks like anyway.
+        start_ts = float(gen.uniform(0.0, max(1.0, horizon_s)))
         episode_id = f"{genome.attack_id}-{episode:04d}"
         specs.extend(
             interpret_episode(genome, holder, start_ts, gen, ledger, episode_id)

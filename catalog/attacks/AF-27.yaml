@@ -1,0 +1,32 @@
+attack_id: AF-27
+attack_name: "Agent-swarm micro-authorisation probing"
+family: agentic_commerce
+payment_surface: [card_not_present]
+genai_role: >
+  Hypothesised coordination of many autonomous agent instances that each place
+  small authorisations to learn which instruments and amounts clear. We model
+  only the aggregate velocity and device-rotation footprint of such a swarm; no
+  agent code, orchestration, or instrument data is represented.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Many low-value authorisations arrive across rotating devices in a short window"
+  - "Success ratio per instrument informs subsequent amount selection"
+behavioral_signals:
+  - device_rotation_rate
+  - low_value_probe_density
+  - asn_diversity_zscore
+  - inter_arrival_regularity
+detection_hypotheses: [velocity_anomaly, enumeration_signature]
+mitigation_options: [rate_limit_hold, device_reputation_check, soft_warn]
+risk_level: medium
+validation_status: unverified_hypothetical
+harm_review: "No agent code, orchestration, or instrument data; velocity parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "18_24", target_side: account}
+  amount_policy: {type: random, base: balance, steps: [0.02], max_fraction: 0.1}
+  timing_policy: {inter_txn_delay_mu: 0.3, inter_txn_delay_sigma: 0.1, dwell_before_cashout_h: 0.0}
+  device_policy: {reuse: rotating, tamper: true, device_count: 12}
+  channel_mix: {weights: {a2a: 0.05, wallet: 0.15, card_not_present: 0.8}}
+  friction_response: {abandon_prob: 0.7, retry_after_h: 0.25, max_retries: 8}
+  resource_budget: {mule_accounts: 0, synthetic_identities: 0, devices: 12, operator_hours: 0.5}

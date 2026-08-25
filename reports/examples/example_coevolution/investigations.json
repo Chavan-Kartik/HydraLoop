@@ -1,0 +1,104 @@
+[
+  {
+    "txn_id": "c01437-2263491-49112",
+    "risk_score": 1.0,
+    "is_fraud": true,
+    "reason_codes": [
+      {
+        "feature": "mcc",
+        "contribution": 4.398213231000392
+      },
+      {
+        "feature": "amount_minor",
+        "contribution": 3.7853373182863326
+      },
+      {
+        "feature": "amount_log",
+        "contribution": 2.161406573131223
+      },
+      {
+        "feature": "payee_is_new",
+        "contribution": 0.7171078077378287
+      },
+      {
+        "feature": "amount_zscore",
+        "contribution": 0.5056619612266302
+      }
+    ],
+    "counterfactual": {
+      "feature": "payee_is_new",
+      "from_value": 1.0,
+      "to_value": 0.0,
+      "risk_before": 1.0,
+      "risk_after": 0.2579859577790934
+    }
+  },
+  {
+    "txn_id": "c00908-2328261-49170",
+    "risk_score": 0.779671634541989,
+    "is_fraud": true,
+    "reason_codes": [
+      {
+        "feature": "amount_minor",
+        "contribution": 3.836430157295438
+      },
+      {
+        "feature": "mcc",
+        "contribution": 3.5083846938121863
+      },
+      {
+        "feature": "amount_log",
+        "contribution": 1.856393536277739
+      },
+      {
+        "feature": "day_of_week",
+        "contribution": 0.7353770629462453
+      },
+      {
+        "feature": "hour_of_day",
+        "contribution": 0.65595617054817
+      }
+    ],
+    "counterfactual": {
+      "feature": "payee_is_new",
+      "from_value": 1.0,
+      "to_value": 0.0,
+      "risk_before": 0.779671634541989,
+      "risk_after": 0.14787185055898613
+    }
+  },
+  {
+    "txn_id": "c01204-1598651-48729",
+    "risk_score": 0.24454544479731383,
+    "is_fraud": true,
+    "reason_codes": [
+      {
+        "feature": "mcc",
+        "contribution": 4.0489243892215265
+      },
+      {
+        "feature": "amount_minor",
+        "contribution": 2.926360772308638
+      },
+      {
+        "feature": "amount_log",
+        "contribution": 2.0703784652812156
+      },
+      {
+        "feature": "balance_ratio",
+        "contribution": 1.023297103600534
+      },
+      {
+        "feature": "account_age_days",
+        "contribution": -1.0015592168609235
+      }
+    ],
+    "counterfactual": {
+      "feature": "payee_is_new",
+      "from_value": 1.0,
+      "to_value": 0.0,
+      "risk_before": 0.24454544479731383,
+      "risk_after": 0.1540006574973524
+    }
+  }
+]

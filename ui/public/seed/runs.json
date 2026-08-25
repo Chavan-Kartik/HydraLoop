@@ -1,18 +1,74 @@
 {
   "runs": [
     {
+      "run_id": "test_loop",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "7449c113b6cf486081a58d11cdf594f8",
+      "mtime": 1786866358.7636425
+    },
+    {
+      "run_id": "arena_20260815_100755",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786768690.103509
+    },
+    {
+      "run_id": "arena_20260815_083608",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786763180.6894555
+    },
+    {
+      "run_id": "arena_20260815_083559",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786763173.2428186
+    },
+    {
+      "run_id": "run_20260815_083433",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "dae61caee05b4ae81c26f2a5e72e0580",
+      "mtime": 1786763080.4246223
+    },
+    {
+      "run_id": "run_20260815_083349",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "3231f2d55ba1f27590f3072223c3df07",
+      "mtime": 1786763071.006288
+    },
+    {
+      "run_id": "arena_20260815_083407",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786763056.3163419
+    },
+    {
+      "run_id": "arena_20260815_004430",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "0db12a251deda83eb84e9ee00411139b",
+      "mtime": 1786734878.9122083
+    },
+    {
+      "run_id": "run_20260815_004225",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "df3c6851e35984e1c0bc2f0546a04e4a",
+      "mtime": 1786734775.0144646
+    },
+    {
       "run_id": "example_coevolution",
       "source": "examples",
       "generations": 4,
       "head_hash": "7e11a43d1df5034fee63e3e7c00d3e9a",
       "mtime": 1786731992.727667
-    },
-    {
-      "run_id": "example_coevolution",
-      "source": "runs",
-      "generations": 4,
-      "head_hash": "7e11a43d1df5034fee63e3e7c00d3e9a",
-      "mtime": 1786731992.7100847
     }
   ]
 }

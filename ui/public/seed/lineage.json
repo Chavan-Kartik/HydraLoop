@@ -1,0 +1,178 @@
+{
+  "run_id": "example_coevolution",
+  "nodes": [
+    {
+      "id": "1:4b939db82a56abf4",
+      "generation": 1,
+      "genome_id": "4b939db82a56abf4",
+      "attack_id": "AF-21",
+      "family": "money_movement",
+      "size": 7,
+      "brief": "AF-21.g0.v0: a money-movement and layering scheme targeting the 35-44 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 3.5 log-seconds and a 2.0-hour dwell before cash-out. Funds fan out to 8 mule account(s) across 3 layer(s). When challenged with a step-up it abandons with probability 0.25 and retries after 4 hours. Budget: 8 mule account(s), 2 synthetic identity(ies), 6.0 operator hours."
+    },
+    {
+      "id": "1:b5313dfaecd3cf3d",
+      "generation": 1,
+      "genome_id": "b5313dfaecd3cf3d",
+      "attack_id": "AF-01",
+      "family": "synthetic_identity",
+      "size": 27,
+      "brief": "AF-01.g0.v0: a synthetic-identity operation targeting the 25-34 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 60% of the target's limit, favouring the a2a channel, with inter-transaction delays around 6.0 log-seconds and a 12.0-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 2 mule account(s), 3 synthetic identity(ies), 5.0 operator hours."
+    },
+    {
+      "id": "1:ce540372ac6a9708",
+      "generation": 1,
+      "genome_id": "ce540372ac6a9708",
+      "attack_id": "AF-09",
+      "family": "social_engineering",
+      "size": 1,
+      "brief": "AF-09.g0.v0: an authorised-push-payment scam funnel targeting the 55-plus age band in the 60-90 balance percentile. It escalates value through a 3-step ladder up to 60% of the target's balance, favouring the a2a channel, with inter-transaction delays around 6.2 log-seconds and a 2.5-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.35 and retries after 6 hours. Budget: 3 mule account(s), 0 synthetic identity(ies), 1.5 operator hours."
+    },
+    {
+      "id": "1:3adde2ea5751d861",
+      "generation": 1,
+      "genome_id": "3adde2ea5751d861",
+      "attack_id": "AF-01",
+      "family": "social_engineering",
+      "size": 9,
+      "brief": "AF-10.g0.v0: an authorised-push-payment scam funnel targeting the 45-54 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 8.0 log-seconds and a 24.0-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.20 and retries after 12 hours. Budget: 2 mule account(s), 0 synthetic identity(ies), 3.0 operator hours."
+    },
+    {
+      "id": "2:3adde2ea5751d861",
+      "generation": 2,
+      "genome_id": "3adde2ea5751d861",
+      "attack_id": "AF-10",
+      "family": "social_engineering",
+      "size": 11,
+      "brief": "AF-10.g0.v0: an authorised-push-payment scam funnel targeting the 45-54 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 8.0 log-seconds and a 24.0-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.20 and retries after 12 hours. Budget: 2 mule account(s), 0 synthetic identity(ies), 3.0 operator hours."
+    },
+    {
+      "id": "3:970a62d7215686b0",
+      "generation": 3,
+      "genome_id": "970a62d7215686b0",
+      "attack_id": "AF-02",
+      "family": "synthetic_identity",
+      "size": 9,
+      "brief": "AF-02.g0.v0: a synthetic-identity operation targeting the 25-34 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 95% of the target's limit, favouring the a2a channel, with inter-transaction delays around 5.0 log-seconds and a 1.5-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 2 mule account(s), 1 synthetic identity(ies), 4.0 operator hours."
+    },
+    {
+      "id": "4:0e81a06cc0f66a41",
+      "generation": 4,
+      "genome_id": "0e81a06cc0f66a41",
+      "attack_id": "AF-01",
+      "family": "synthetic_identity",
+      "size": 10,
+      "brief": "AF-02.g0.v0: a synthetic-identity operation targeting the 25-34 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 95% of the target's limit, favouring the a2a channel, with inter-transaction delays around 5.0 log-seconds and a 1.5-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 2 mule account(s), 1 synthetic identity(ies), 4.0 operator hours."
+    }
+  ],
+  "edges": [
+    {
+      "from": "1:b5313dfaecd3cf3d",
+      "to": "1:3adde2ea5751d861",
+      "attack_id": "AF-01"
+    },
+    {
+      "from": "1:3adde2ea5751d861",
+      "to": "4:0e81a06cc0f66a41",
+      "attack_id": "AF-01"
+    }
+  ],
+  "genomes": [
+    {
+      "attack_id": "AF-01",
+      "genome_id": "b5313dfaecd3cf3d",
+      "family": "synthetic_identity",
+      "brief": "AF-01.g0.v0: a synthetic-identity operation targeting the 25-34 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 60% of the target's limit, favouring the a2a channel, with inter-transaction delays around 6.0 log-seconds and a 12.0-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 2 mule account(s), 3 synthetic identity(ies), 5.0 operator hours."
+    },
+    {
+      "attack_id": "AF-02",
+      "genome_id": "0e81a06cc0f66a41",
+      "family": "synthetic_identity",
+      "brief": "AF-02.g0.v0: a synthetic-identity operation targeting the 25-34 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 95% of the target's limit, favouring the a2a channel, with inter-transaction delays around 5.0 log-seconds and a 1.5-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 2 mule account(s), 1 synthetic identity(ies), 4.0 operator hours."
+    },
+    {
+      "attack_id": "AF-05",
+      "genome_id": "ba1b1786514cbe01",
+      "family": "account_takeover",
+      "brief": "AF-05.g0.v0: an account-takeover operation targeting the 35-44 age band in the 50-90 balance percentile. It moves flat amounts up to 30% of the target's balance, favouring the card_not_present channel, with inter-transaction delays around 2.0 log-seconds and a 0.5-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.60 and retries after 1 hours. Budget: 1 mule account(s), 0 synthetic identity(ies), 1.0 operator hours."
+    },
+    {
+      "attack_id": "AF-06",
+      "genome_id": "da6432d68026672f",
+      "family": "account_takeover",
+      "brief": "AF-06.g0.v0: an account-takeover operation targeting the 45-54 age band in the 60-95 balance percentile. It moves flat amounts up to 80% of the target's balance, favouring the a2a channel, with inter-transaction delays around 3.0 log-seconds and a 0.5-hour dwell before cash-out. Funds fan out to 1 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 1 mule account(s), 0 synthetic identity(ies), 0.5 operator hours."
+    },
+    {
+      "attack_id": "AF-09",
+      "genome_id": "ce540372ac6a9708",
+      "family": "social_engineering",
+      "brief": "AF-09.g0.v0: an authorised-push-payment scam funnel targeting the 55-plus age band in the 60-90 balance percentile. It escalates value through a 3-step ladder up to 60% of the target's balance, favouring the a2a channel, with inter-transaction delays around 6.2 log-seconds and a 2.5-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.35 and retries after 6 hours. Budget: 3 mule account(s), 0 synthetic identity(ies), 1.5 operator hours."
+    },
+    {
+      "attack_id": "AF-10",
+      "genome_id": "3adde2ea5751d861",
+      "family": "social_engineering",
+      "brief": "AF-10.g0.v0: an authorised-push-payment scam funnel targeting the 45-54 age band in the 50-90 balance percentile. It escalates value through a 4-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 8.0 log-seconds and a 24.0-hour dwell before cash-out. Funds fan out to 2 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.20 and retries after 12 hours. Budget: 2 mule account(s), 0 synthetic identity(ies), 3.0 operator hours."
+    },
+    {
+      "attack_id": "AF-13",
+      "genome_id": "6ae83c67b0804951",
+      "family": "merchant_abuse",
+      "brief": "AF-13.g0.v0: a merchant-side abuse scheme targeting the 35-44 age band in the 50-90 balance percentile. It moves flat amounts up to 25% of the target's limit, favouring the card_not_present channel, with inter-transaction delays around 5.0 log-seconds and a 8.0-hour dwell before cash-out. Funds fan out to 1 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 8 mule account(s), 1 synthetic identity(ies), 6.0 operator hours."
+    },
+    {
+      "attack_id": "AF-14",
+      "genome_id": "fe60421d1ce8ce7b",
+      "family": "merchant_abuse",
+      "brief": "AF-14.g0.v0: a merchant-side abuse scheme targeting the 25-34 age band in the 50-90 balance percentile. It moves flat amounts up to 30% of the target's limit, favouring the card_not_present channel, with inter-transaction delays around 4.0 log-seconds and a 6.0-hour dwell before cash-out. Funds fan out to 1 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 12 mule account(s), 2 synthetic identity(ies), 8.0 operator hours."
+    },
+    {
+      "attack_id": "AF-17",
+      "genome_id": "d8289b305685f335",
+      "family": "card_testing",
+      "brief": "AF-17.g0.v0: a card-testing and enumeration campaign targeting the 18-24 age band in the 50-90 balance percentile. It moves flat amounts up to 2% of the target's balance, favouring the card_not_present channel, with inter-transaction delays around 1.0 log-seconds and a 0.1-hour dwell before cash-out. Funds fan out to 0 mule account(s) across 0 layer(s). When challenged with a step-up it abandons with probability 0.80 and retries after 0 hours. Budget: 0 mule account(s), 0 synthetic identity(ies), 0.5 operator hours."
+    },
+    {
+      "attack_id": "AF-18",
+      "genome_id": "d78fd63108640fd2",
+      "family": "card_testing",
+      "brief": "AF-18.g0.v0: a card-testing and enumeration campaign targeting the 18-24 age band in the 50-90 balance percentile. It moves flat amounts up to 2% of the target's balance, favouring the card_not_present channel, with inter-transaction delays around 0.8 log-seconds and a 0.1-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.85 and retries after 0 hours. Budget: 0 mule account(s), 0 synthetic identity(ies), 0.8 operator hours."
+    },
+    {
+      "attack_id": "AF-21",
+      "genome_id": "4b939db82a56abf4",
+      "family": "money_movement",
+      "brief": "AF-21.g0.v0: a money-movement and layering scheme targeting the 35-44 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 3.5 log-seconds and a 2.0-hour dwell before cash-out. Funds fan out to 8 mule account(s) across 3 layer(s). When challenged with a step-up it abandons with probability 0.25 and retries after 4 hours. Budget: 8 mule account(s), 2 synthetic identity(ies), 6.0 operator hours."
+    },
+    {
+      "attack_id": "AF-22",
+      "genome_id": "62b8a81f65b5afb1",
+      "family": "money_movement",
+      "brief": "AF-22.g0.v0: a money-movement and layering scheme targeting the 45-54 age band in the 50-90 balance percentile. It moves flat amounts up to 10% of the target's balance, favouring the a2a channel, with inter-transaction delays around 2.5 log-seconds and a 1.0-hour dwell before cash-out. Funds fan out to 6 mule account(s) across 2 layer(s). When challenged with a step-up it abandons with probability 0.30 and retries after 6 hours. Budget: 6 mule account(s), 1 synthetic identity(ies), 5.0 operator hours."
+    },
+    {
+      "attack_id": "AF-25",
+      "genome_id": "bbdfcc8b560a1b16",
+      "family": "agentic_commerce",
+      "brief": "AF-25.g0.v0: an autonomous agent-initiated payment scheme targeting the 35-44 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 50% of the target's limit, favouring the card_not_present channel, with inter-transaction delays around 0.8 log-seconds and a 0.2-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.20 and retries after 0 hours. Budget: 1 mule account(s), 0 synthetic identity(ies), 0.5 operator hours."
+    },
+    {
+      "attack_id": "AF-26",
+      "genome_id": "4061369a3782fba1",
+      "family": "agentic_commerce",
+      "brief": "AF-26.g0.v0: an autonomous agent-initiated payment scheme targeting the 25-34 age band in the 50-90 balance percentile. It moves flat amounts up to 40% of the target's balance, favouring the wallet channel, with inter-transaction delays around 0.6 log-seconds and a 0.1-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.35 and retries after 0 hours. Budget: 1 mule account(s), 0 synthetic identity(ies), 0.5 operator hours."
+    },
+    {
+      "attack_id": "AF-27",
+      "genome_id": "c63a3d380086d79a",
+      "family": "agentic_commerce",
+      "brief": "AF-27.g0.v0: an autonomous agent-initiated payment scheme targeting the 18-24 age band in the 50-90 balance percentile. It moves random amounts up to 10% of the target's balance, favouring the card_not_present channel, with inter-transaction delays around 0.3 log-seconds and a 0.0-hour dwell before cash-out. Funds fan out to 3 mule account(s) across 1 layer(s). When challenged with a step-up it abandons with probability 0.70 and retries after 0 hours. Budget: 0 mule account(s), 0 synthetic identity(ies), 0.5 operator hours."
+    },
+    {
+      "attack_id": "AF-28",
+      "genome_id": "2d1d2ec182159671",
+      "family": "agentic_commerce",
+      "brief": "AF-28.g0.v0: an autonomous agent-initiated payment scheme targeting the 45-54 age band in the 50-90 balance percentile. It escalates value through a 3-step ladder up to 70% of the target's balance, favouring the a2a channel, with inter-transaction delays around 1.0 log-seconds and a 0.5-hour dwell before cash-out. Funds fan out to 4 mule account(s) across 3 layer(s). When challenged with a step-up it abandons with probability 0.15 and retries after 1 hours. Budget: 4 mule account(s), 0 synthetic identity(ies), 1.0 operator hours."
+    }
+  ]
+}

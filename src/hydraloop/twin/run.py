@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
+
 from ..config import Config
 from ..paths import run_dir
 from .arrivals import population_arrivals
@@ -35,9 +37,24 @@ def build_engine(cfg: Config) -> tuple[TwinEngine, RngRegistry]:
 
 
 def legit_session_specs(cfg: Config, engine: TwinEngine, registry: RngRegistry, target: int) -> list[SessionSpec]:
+    """Legitimate sessions covering the whole horizon, thinned down to ``target``.
+
+    The population deliberately over-generates so arrivals exceed the target, which
+    means the surplus has to be dropped. It must be dropped *uniformly*, not by
+    slicing the front of the list: ``population_arrivals`` returns time-sorted
+    arrivals, so keeping the first ``target`` of them confines legitimate traffic to
+    the opening days of the horizon while attack sessions stay spread across all of
+    it. A temporal train/test split then lands inside that dense opening window and
+    files almost every fraudulent row into test -- training sees a handful of
+    positives and no supervised model can learn. Uniform thinning of a Poisson
+    process is itself a Poisson process, so the diurnal and weekly shape survives.
+    """
     horizon_s = cfg.simulation.horizon_days * SECONDS_PER_DAY
     arrivals = population_arrivals(registry, engine.pop.cardholders, horizon_s)
-    arrivals = arrivals[:target]
+    if target < len(arrivals):
+        gen = registry.stream("arrivals:thin")
+        keep = np.sort(gen.choice(len(arrivals), size=target, replace=False))
+        arrivals = [arrivals[i] for i in keep]
     return [SessionSpec(ts=ts, cardholder_id=cid) for ts, cid in arrivals]
 
 

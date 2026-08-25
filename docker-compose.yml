@@ -1,7 +1,13 @@
 services:
-  hydraloop:
+  api:
     build: .
-    command: python -m hydraloop demo
+    environment:
+      # The image defaults to 7860 for Hugging Face Spaces; locally the UI
+      # expects the backend on 8000.
+      PORT: 8000
+      HYDRALOOP_ALLOWED_ORIGINS: "http://localhost:3000,http://127.0.0.1:3000"
+    ports:
+      - "8000:8000"
     volumes:
+      # Lab and harden runs append to the ledger; keep them on the host.
       - ./reports:/app/reports
-      - ./data:/app/data

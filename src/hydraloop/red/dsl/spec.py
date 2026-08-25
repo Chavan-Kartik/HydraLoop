@@ -20,6 +20,7 @@ FAMILIES = (
     "merchant_abuse",
     "card_testing",
     "money_movement",
+    "agentic_commerce",
 )
 
 AGE_BANDS = ("18_24", "25_34", "35_44", "45_54", "55_plus")

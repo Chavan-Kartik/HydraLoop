@@ -30,3 +30,22 @@ def test_valid_llm_output_is_accepted():
     assert child.genome_id == good.genome_id
     assert strat.audit_log[-1].accepted
     assert "validated" in strat.audit_log[-1].reason
+
+
+def test_partial_out_of_bounds_overlay_is_repaired():
+    # A small model emits a partial overlay with an out-of-range value wrapped in
+    # prose. It must be clamped onto the parent and accepted, not refused.
+    overlay = '```json\n{"amount_policy": {"max_fraction": 9.9}, "friction_response": {"abandon_prob": 0.1}}\n```'
+    strat = Strategist(rng=np.random.default_rng(0), llm=lambda _p: overlay)
+    child = strat.propose(default_genome())
+    child.validate()  # must not raise
+    assert strat.audit_log[-1].accepted
+    assert "repaired" in strat.audit_log[-1].reason
+    assert child.genes["amount_policy"]["max_fraction"] <= 1.0
+    assert child.genes["friction_response"]["abandon_prob"] == 0.1
+
+
+def test_accepted_and_refusals_partition_audit_log():
+    strat = Strategist(rng=np.random.default_rng(0), llm=lambda _p: "garbage")
+    strat.propose(default_genome())
+    assert len(strat.accepted()) + len(strat.refusals()) == len(strat.audit_log)

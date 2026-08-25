@@ -7,23 +7,73 @@ arena events with resume-from-sequence and an honest drop-oldest indicator.
 from __future__ import annotations
 
 import asyncio
+import json
+import os
+from concurrent.futures import ThreadPoolExecutor
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, StreamingResponse
+from pydantic import BaseModel, Field
 
+from . import harden as harden_module
+from . import lab as lab_module
 from . import ledger_source as src
 from .hub import EventHub
 
 app = FastAPI(title="HydraLoop Command Center", version="1.0")
 
+# The dev server origins are always allowed. A deployed UI lives on a different
+# origin, so its URL has to be added at runtime: set HYDRALOOP_ALLOWED_ORIGINS to
+# a comma-separated list. Without this the browser blocks every call from the
+# hosted front end and the console silently falls back to its seeded snapshot,
+# which looks like a working demo but is not talking to the backend at all.
+_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
+_EXTRA_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("HYDRALOOP_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=_DEV_ORIGINS + _EXTRA_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 _MAX_TICK_MS = 2000
+_RUN_POOL = ThreadPoolExecutor(max_workers=1, thread_name_prefix="hydraloop-loop")
+_JOBS: dict[str, dict] = {}
+
+_ROOT_HTML = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>HydraLoop API</title>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, sans-serif; max-width: 40rem;
+           margin: 12vh auto; padding: 0 1.5rem; color: #0b1220; line-height: 1.5; }
+    a { color: #4f46e5; }
+    code { background: #eef1f7; padding: 0.1rem 0.35rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <p>This is the <strong>HydraLoop API</strong>, not the UI.</p>
+  <p>Open the command center at
+     <a href="http://127.0.0.1:3000">http://127.0.0.1:3000</a>
+     after starting it with <code>cd ui; npm run dev</code>.</p>
+  <p>Health check: <a href="/api/health">/api/health</a></p>
+</body>
+</html>
+"""
+
+
+@app.get("/", response_class=HTMLResponse)
+def root() -> str:
+    """Browser landing: this port is the API, the UI lives on :3000."""
+    return _ROOT_HTML
 
 
 @app.get("/api/health")
@@ -53,18 +103,151 @@ def arena(run_id: str) -> dict:
     return {"run_id": run_id, "events": src.arena_events(run_id)}
 
 
+@app.get("/api/threats")
+def threats() -> dict:
+    """The abstracted threat catalog grouped by family (not run-specific)."""
+    return src.threat_catalog()
+
+
+@app.get("/api/lineage/{run_id}")
+def lineage(run_id: str) -> dict:
+    return src.genome_lineage(run_id)
+
+
+@app.get("/api/investigations/{run_id}")
+def investigations(run_id: str) -> dict:
+    return src.investigations(run_id)
+
+
+@app.get("/api/governance/{run_id}")
+def governance(run_id: str) -> dict:
+    """Recompute the hash chain and report tamper-evidence for the run's ledger."""
+    return src.verify_ledger(run_id)
+
+
+@app.get("/api/kpis/{run_id}")
+def kpis(run_id: str) -> dict:
+    return src.kpis(run_id)
+
+
+@app.get("/api/strategist/{run_id}")
+def strategist(run_id: str) -> dict:
+    """The GenAI red-team strategist's audit: proposals, accepts, refusals, samples."""
+    return src.strategist(run_id)
+
+
+@app.get("/api/data-benchmark/{run_id}")
+def data_benchmark(run_id: str) -> dict:
+    """Fidelity vs a real/shifted reference: discriminator AUC, marginals, TSTR/TRTS."""
+    return src.data_benchmark(run_id)
+
+
+@app.get("/api/lab/presets")
+def lab_presets() -> dict:
+    return {"presets": [{"id": k, "text": v} for k, v in lab_module.PRESETS.items()]}
+
+
+class LabBody(BaseModel):
+    text: str = Field(..., min_length=12, max_length=600)
+
+
+@app.post("/api/lab")
+def lab(body: LabBody) -> dict:
+    """Type a threat. Get Identify -> Generate -> Simulate -> Detect on one payload."""
+    try:
+        return lab_module.run_lab(body.text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/lab/stream")
+def lab_stream(body: LabBody):
+    """Same as POST /api/lab, but each pipeline stage is flushed as NDJSON."""
+
+    def gen():
+        try:
+            for event in lab_module.iter_lab(body.text):
+                yield json.dumps(event, default=str) + "\n"
+        except ValueError as exc:
+            yield json.dumps({"type": "error", "detail": str(exc)}) + "\n"
+        except Exception as exc:  # noqa: BLE001 — surface to the UI
+            yield json.dumps({"type": "error", "detail": str(exc)}) + "\n"
+
+    return StreamingResponse(gen(), media_type="application/x-ndjson")
+
+
+@app.post("/api/harden/stream")
+def harden_stream(body: LabBody):
+    """The closed loop on demand: let the attack escape, harden, then re-attack.
+
+    Streams NDJSON so the UI can paint the incumbent, the escape, the retrain, the
+    gauntlet verdict and the re-attack result as each one is computed.
+    """
+
+    def gen():
+        try:
+            for event in harden_module.iter_harden(body.text):
+                yield json.dumps(event, default=str) + "\n"
+        except Exception as exc:  # noqa: BLE001 -- surface to the UI, never 500 mid-stream
+            yield json.dumps({"type": "error", "detail": str(exc)}) + "\n"
+
+    return StreamingResponse(gen(), media_type="application/x-ndjson")
+
+
+@app.get("/api/lab/latest")
+def lab_latest() -> dict:
+    data = lab_module.load_latest_lab()
+    if not data:
+        raise HTTPException(status_code=404, detail="no lab run yet — open Lab and press Run")
+    return data
+
+
 @app.post("/api/run")
-def run_coevolution(generations: int = 5) -> dict:
-    """Kick a short co-evolution run and return its id (runs in a worker thread)."""
+def run_coevolution(generations: int = 3) -> dict:
+    """Start a short co-evolution run in the background and return its id immediately.
+
+    The UI streams events as the ledger grows. Uses ``configs/live.yaml`` so a
+    demo finishes in tens of seconds, not minutes.
+    """
     import datetime as dt
 
+    gens = max(1, min(int(generations), 5))
+    run_id = dt.datetime.now().strftime("arena_%Y%m%d_%H%M%S")
+    _JOBS[run_id] = {"status": "queued", "error": None}
+    _RUN_POOL.submit(_execute_run, run_id, gens)
+    return {
+        "run_id": run_id,
+        "generations": gens,
+        "status": "queued",
+        "note": "computing in background; poll GET /api/run/{run_id}",
+    }
+
+
+@app.get("/api/run/{run_id}")
+def run_status(run_id: str) -> dict:
+    job = _JOBS.get(run_id) or {"status": "unknown", "error": None}
+    entries = src.load_ledger_entries(run_id)
+    return {
+        "run_id": run_id,
+        "status": job.get("status", "unknown"),
+        "error": job.get("error"),
+        "generations_done": len(entries),
+        "event_count": len(src.arena_events(run_id)),
+    }
+
+
+def _execute_run(run_id: str, generations: int) -> None:
     from ..config import load_config
     from ..loop.orchestrator import run_loop
+    from ..paths import CONFIGS_DIR
 
-    run_id = dt.datetime.now().strftime("arena_%Y%m%d_%H%M%S")
-    cfg = load_config()
-    run_loop(cfg, run_id, generations=max(1, min(generations, 10)))
-    return {"run_id": run_id, "generations": generations}
+    _JOBS[run_id] = {"status": "running", "error": None}
+    try:
+        cfg = load_config(CONFIGS_DIR / "live.yaml")
+        run_loop(cfg, run_id, generations=generations)
+        _JOBS[run_id] = {"status": "done", "error": None}
+    except Exception as exc:  # noqa: BLE001 — surface to the UI, do not crash the API
+        _JOBS[run_id] = {"status": "error", "error": str(exc)}
 
 
 def _build_hub(run_id: str) -> EventHub:

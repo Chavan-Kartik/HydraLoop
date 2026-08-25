@@ -1,0 +1,37 @@
+{
+  "run_id": "example_coevolution",
+  "provider": "none",
+  "model": null,
+  "available": false,
+  "proposals": 45,
+  "accepted": 45,
+  "refused": 0,
+  "llm_authored": 0,
+  "samples": [],
+  "entries": [],
+  "requires_api_key": false,
+  "default_mode": "constrained_planner",
+  "optional_provider": "ollama (local, no cloud key)",
+  "guardrail": "schema-validated genome only; refusals logged; no free-text attacks",
+  "pipeline": [
+    {
+      "verb": "Identify",
+      "title": "Emerging GenAI fraud, as behaviour",
+      "detail": "28 catalogued scenarios across 7 families, including agentic commerce. A writeup maps to a bounded genome \u2014 never a recipe.",
+      "href": "/threats"
+    },
+    {
+      "verb": "Generate",
+      "title": "Schema-constrained proposals, then the twin",
+      "detail": "The strategist only emits genome parameters. Invalid output is refused. The twin runs what survives against a live policy.",
+      "href": "/lineage"
+    },
+    {
+      "verb": "Defend",
+      "title": "Escapes become the next training set",
+      "detail": "The ensemble scores, the policy acts, immune memory retrains, and a gauntlet must pass before promotion.",
+      "href": "/investigations"
+    }
+  ],
+  "source": "example_evolve"
+}

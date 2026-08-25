@@ -122,15 +122,96 @@ def evaluate(
 def evolve(
     config: str = typer.Option(None),
     generations: int = typer.Option(15, help="Co-evolution generations (Gate G4 needs 15+)."),
+    llm: str = typer.Option("none", help="GenAI strategist provider: none | ollama."),
+    llm_model: str = typer.Option("llama3.2", help="Local model name for the strategist."),
+    llm_base_url: str = typer.Option("http://localhost:11434", help="Ollama base URL."),
     run_id: str = typer.Option(None),
 ) -> None:
-    """Run red-team economics + quality-diversity search vs the live policy (Phase 9)."""
+    """Run red-team economics + quality-diversity search vs the live policy (Phase 9).
+
+    Pass ``--llm ollama`` to drive the red team with a local language model
+    (schema-validated, offline). Without it, a deterministic planner is used, so
+    the run never depends on a model being present.
+    """
     from .red.coevolution import run_coevolution_economics
 
     cfg = load_config(config)
     rid = run_id or _new_run_id()
-    out = run_coevolution_economics(cfg, rid, generations=generations)
+    out = run_coevolution_economics(
+        cfg, rid, generations=generations,
+        llm_provider=llm, llm_model=llm_model, llm_base_url=llm_base_url,
+    )
     typer.echo(f"Co-evolution economics written to {out}")
+
+
+@app.command()
+def discover(
+    text: str = typer.Argument(..., help="Abstract description of an emerging fraud trend."),
+    llm: str = typer.Option("none", help="GenAI mapper provider: none | ollama."),
+    llm_model: str = typer.Option("llama3.2", help="Local model name."),
+    run_id: str = typer.Option(None),
+) -> None:
+    """Identify: map an emerging-threat writeup into a simulatable attack genome.
+
+    Turns a paragraph of abstract fraud intel into a schema-valid attack genome the
+    twin can run - discovery, not a hand-written catalog entry. Uses a local model
+    when ``--llm ollama`` is set, otherwise a deterministic keyword mapper.
+    """
+    import json as _json
+
+    import numpy as _np
+
+    from .red.discover import discover_threat
+    from .red.llm import make_llm_client
+
+    ensure_dirs()
+    rid = run_id or _new_run_id()
+    client = make_llm_client(llm, llm_model)
+    result = discover_threat(text, _np.random.default_rng(0), llm=client)
+    out = run_dir(rid) / "discovered_threat.json"
+    out.write_text(_json.dumps(result, indent=2), encoding="utf-8")
+    typer.echo(f"Discovered '{result['attack_name']}' -> family={result['family']} "
+               f"(method={result['method']}), genome {result['genome_id']}")
+    typer.echo(f"  {result['brief']}")
+    typer.echo(f"Written to {out}")
+
+
+@app.command()
+def bench(
+    config: str = typer.Option(None),
+    preset: str = typer.Option(None, help="Built-in dataset: sparkov | paysim | creditcard."),
+    csv: str = typer.Option(None, help="External transaction CSV to benchmark against."),
+    amount_col: str = typer.Option("amount", help="External amount column."),
+    timestamp_col: str = typer.Option("timestamp", help="External timestamp column."),
+    fraud_col: str = typer.Option("is_fraud", help="External fraud-label column."),
+    amount_is_minor: bool = typer.Option(False, help="External amounts are already in minor units."),
+    run_id: str = typer.Option(None),
+) -> None:
+    """Benchmark synthetic traffic against a reference for fidelity + TSTR/TRTS.
+
+    ``--preset sparkov`` (or paysim/creditcard) benchmarks against a real public
+    dataset placed under ``data/external/<preset>.csv``. With neither preset nor
+    ``--csv`` it runs synthetic-shift mode. If a preset file is missing it degrades
+    gracefully to synthetic shift so the demo never breaks.
+    """
+    from .evaluation.data_adapter import ColumnMap, run_data_benchmark
+
+    cfg = load_config(config)
+    rid = run_id or _new_run_id()
+    colmap = None if preset else ColumnMap(
+        amount=amount_col,
+        timestamp=timestamp_col,
+        is_fraud=fraud_col,
+        amount_is_minor=amount_is_minor,
+    )
+    report = run_data_benchmark(
+        cfg, external_csv=csv, colmap=colmap, out_dir=run_dir(rid), preset=preset
+    )
+    auc = report.get("discriminator_auc")
+    typer.echo(f"Data benchmark ({report['mode']}) written to {run_dir(rid)}")
+    if report.get("note"):
+        typer.echo(f"  note: {report['note']}")
+    typer.echo(f"  discriminator AUC: {auc} ({report.get('interpretation', '')})")
 
 
 @app.command()

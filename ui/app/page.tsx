@@ -1,10 +1,10 @@
-import { Arena } from "@/components/Arena";
+import { Suspense } from "react";
+import { Lab } from "@/components/Lab";
 
-export default function ArenaPage() {
+export default function HomePage() {
   return (
-    <main>
-      <h1 className="mb-4 text-2xl font-bold text-slate-100">Arena</h1>
-      <Arena />
-    </main>
+    <Suspense fallback={<div className="text-sm text-ink-ghost">Loading lab</div>}>
+      <Lab />
+    </Suspense>
   );
 }

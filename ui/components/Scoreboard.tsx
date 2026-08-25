@@ -2,18 +2,20 @@
 
 import { useCallback, useEffect, useState } from "react";
 import {
+  Area,
+  AreaChart,
   CartesianGrid,
   Legend,
   Line,
-  LineChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { getRuns, getScoreboard, Scoreboard as ScoreData } from "@/lib/api";
-import { Empty, ErrorBox, Loading, OfflineBadge, Panel } from "./StateBlocks";
+import { Badge, Empty, ErrorBox, Loading, OfflineBadge, Panel } from "./ui";
 
 type Status = "loading" | "ready" | "empty" | "error";
 
@@ -56,46 +58,93 @@ export function Scoreboard() {
   return (
     <div className="space-y-4">
       {offline && <OfflineBadge />}
-      <Panel title="Escape rate and archive recall by generation">
-        <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={data.points} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
-            <CartesianGrid stroke="#1e293b" />
-            <XAxis dataKey="generation" stroke="#64748b" />
-            <YAxis stroke="#64748b" domain={[0, 1]} />
-            <Tooltip contentStyle={{ background: "#0b0e14", border: "1px solid #1e293b" }} />
-            <Legend />
+      <Panel title="Escape rate & archive recall by generation">
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart data={data.points} margin={{ top: 10, right: 16, bottom: 4, left: -8 }}>
+            <defs>
+              <linearGradient id="escapeFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#f43f5e" stopOpacity={0.28} />
+                <stop offset="100%" stopColor="#f43f5e" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="#e3e7f0" strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="generation"
+              stroke="#94a3b8"
+              tick={{ fontSize: 12 }}
+              tickLine={false}
+              axisLine={{ stroke: "#e3e7f0" }}
+            />
+            <YAxis
+              stroke="#94a3b8"
+              domain={[0, 1]}
+              tick={{ fontSize: 12 }}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "#ffffff",
+                border: "1px solid #e3e7f0",
+                borderRadius: 12,
+                boxShadow: "0 8px 24px -12px rgba(16,24,40,0.18)",
+                fontSize: 12,
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
             <ReferenceLine
               y={FRICTION_GUARDRAIL}
               stroke="#f59e0b"
-              strokeDasharray="4 4"
-              label={{ value: "friction budget", fill: "#f59e0b", fontSize: 10 }}
+              strokeDasharray="5 4"
+              label={{ value: "friction budget", fill: "#b45309", fontSize: 10, position: "insideTopLeft" }}
             />
-            <Line type="monotone" dataKey="escape_rate" stroke="#ff5c7a" strokeWidth={2} />
+            <Area
+              type="monotone"
+              name="escape rate"
+              dataKey="escape_rate"
+              stroke="#f43f5e"
+              strokeWidth={2.5}
+              fill="url(#escapeFill)"
+            />
             <Line
               type="monotone"
+              name="candidate recall"
               dataKey="candidate_archive_recall"
-              stroke="#4cc9f0"
-              strokeWidth={2}
+              stroke="#4f46e5"
+              strokeWidth={2.5}
+              dot={false}
             />
             <Line
               type="monotone"
+              name="incumbent recall"
               dataKey="incumbent_archive_recall"
-              stroke="#8892b0"
-              strokeDasharray="4 4"
+              stroke="#94a3b8"
+              strokeDasharray="5 4"
+              strokeWidth={1.5}
+              dot={false}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </Panel>
 
       <Panel title="Regression gauntlet log">
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1.5">
           {data.gauntlet_log.map((g, i) => (
-            <li key={i} className="flex gap-3">
-              <span className="text-slate-600">G{g.generation}</span>
-              <span className={g.promoted ? "text-blue" : "text-red"}>
-                {g.promoted ? "PROMOTE" : "REJECT"}
-              </span>
-              <span className="text-slate-400">{g.result}</span>
+            <li
+              key={i}
+              className="flex items-center gap-3 rounded border border-line bg-surface/60 px-3 py-2 text-sm"
+            >
+              <span className="font-mono text-[10px] font-semibold text-ink-ghost">G{g.generation}</span>
+              {g.promoted ? (
+                <Badge tone="blue">
+                  <CheckCircle2 className="h-3 w-3" /> promote
+                </Badge>
+              ) : (
+                <Badge tone="red">
+                  <XCircle className="h-3 w-3" /> reject
+                </Badge>
+              )}
+              <span className="text-ink-faint">{g.result}</span>
             </li>
           ))}
         </ul>

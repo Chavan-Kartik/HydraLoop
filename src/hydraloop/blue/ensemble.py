@@ -23,6 +23,14 @@ from .models.sequence import SequenceModel
 
 BASE_ORDER = ("tabular", "sequence", "graph", "narrative", "sentinel")
 
+# Picking the best of seven candidates needs enough positives for the ranking to
+# mean anything. Below this count the winner is noise: on a 13-positive validation
+# fold the legit-only sentinel measured best (PR-AUC 0.80) and then scored 0.40 on
+# test, where the tabular model reached 0.92. Averaging has no selection variance,
+# so it is the default until there is real evidence to depart from it.
+MIN_SELECTION_POSITIVES = 30
+SELECTION_MARGIN = 0.05
+
 
 class _TabularWrapper:
     def __init__(self, seed: int) -> None:
@@ -59,23 +67,27 @@ class EnsembleDetector:
         val = val_df[mature_mask(val_df)]
         P = self._base_matrix(val)
         y = observed_labels(val)
-        self._combiner = "tabular"  # safe default
+        # Averaging the base probabilities is the default because it carries no
+        # selection variance. A specific combiner has to earn its place by beating
+        # the average by a real margin on a fold with enough positives to trust.
+        self._combiner = "mean"
         if len(np.unique(y)) >= 2:
             self.meta.fit(P, y)
             meta_p = self.meta.predict_proba(P)[:, 1]
             self.calibrator.fit(meta_p, y)
             self._degenerate = False
-            # Stacking overfits tiny validation folds, so the combiner is chosen on
-            # honest out-of-fold stack predictions rather than the same fit used to
-            # train the meta. Candidates are the stack, a plain mean, and each base;
-            # this stops the ensemble ever scoring below its own components.
-            candidates = {"mean": P.mean(axis=1)}
-            for i, name in enumerate(BASE_ORDER):
-                candidates[name] = P[:, i]
-            oof = self._oof_stack(P, y)
-            if oof is not None:
-                candidates["stack"] = oof
-            self._combiner = max(candidates, key=lambda k: pr_auc(y, candidates[k]))
+            if int(y.sum()) >= MIN_SELECTION_POSITIVES:
+                candidates = {"mean": P.mean(axis=1)}
+                for i, name in enumerate(BASE_ORDER):
+                    candidates[name] = P[:, i]
+                # Out-of-fold, so the stack is not judged on the fit it was trained on.
+                oof = self._oof_stack(P, y)
+                if oof is not None:
+                    candidates["stack"] = oof
+                scored = {k: pr_auc(y, v) for k, v in candidates.items()}
+                best = max(scored, key=lambda k: scored[k])
+                if scored[best] > scored["mean"] + SELECTION_MARGIN:
+                    self._combiner = best
         else:
             self._degenerate = True
         return self
@@ -95,7 +107,7 @@ class EnsembleDetector:
         return oof
 
     def _combine(self, P: np.ndarray) -> np.ndarray:
-        combiner = getattr(self, "_combiner", "tabular")
+        combiner = getattr(self, "_combiner", "mean")
         if combiner == "stack":
             return self.calibrator.transform(self.meta.predict_proba(P)[:, 1])
         if combiner == "mean":

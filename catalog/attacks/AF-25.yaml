@@ -1,0 +1,32 @@
+attack_id: AF-25
+attack_name: "Delegated payment-agent mandate drift"
+family: agentic_commerce
+payment_surface: [card_not_present, wallet_topup]
+genai_role: >
+  Hypothesised misuse of an autonomous shopping agent that holds a delegated
+  spending mandate. We model only the statistical footprint of an agent whose
+  purchasing drifts beyond the intended cadence and value band; no agent
+  prompts, credentials, or tool invocations are represented.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "Agent-initiated sessions have atypically regular inter-arrival timing"
+  - "Mandate drift shows as value escalation without human dwell pauses"
+behavioral_signals:
+  - inter_arrival_regularity
+  - value_escalation_without_dwell
+  - session_automation_signature
+  - payee_novelty_rate
+detection_hypotheses: [mandate_scope_drift, machine_cadence_anomaly]
+mitigation_options: [mandate_ceiling_hold, step_up_3ds, cooling_off_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No agent prompts, credentials, or tooling; cadence and value parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "35_44", target_side: account}
+  amount_policy: {type: ladder, base: limit, steps: [0.1, 0.2, 0.4], max_fraction: 0.5}
+  timing_policy: {inter_txn_delay_mu: 0.8, inter_txn_delay_sigma: 0.2, dwell_before_cashout_h: 0.25}
+  device_policy: {reuse: victim_device, tamper: false, device_count: 1}
+  channel_mix: {weights: {a2a: 0.1, wallet: 0.4, card_not_present: 0.5}}
+  friction_response: {abandon_prob: 0.2, retry_after_h: 0.5, max_retries: 6}
+  resource_budget: {mule_accounts: 1, synthetic_identities: 0, devices: 1, operator_hours: 0.5}

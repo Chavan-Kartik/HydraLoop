@@ -18,18 +18,28 @@ from hydraloop.twin.run import build_engine, legit_session_specs
 
 @pytest.fixture(scope="module")
 def labelled_splits():
+    """Splits large enough that a claim about model quality means something.
+
+    Sized deliberately: at 1200 legitimate sessions the validation fold held 13
+    positives and test held 4, which is too few to rank six models against each
+    other -- the assertions below passed or failed on noise rather than on the
+    stack actually working.
+    """
     from hydraloop.config import Config, DefenderConfig, RedTeamConfig, SimulationConfig
 
-    sim = SimulationConfig(seed=11, legitimate_transactions_per_generation=1200, horizon_days=25)
+    n_legit = 7000
+    sim = SimulationConfig(
+        seed=11, legitimate_transactions_per_generation=n_legit, horizon_days=60
+    )
     cfg = Config(raw={}, simulation=sim, defender=DefenderConfig(), red_team=RedTeamConfig())
     engine, registry = build_engine(cfg)
     horizon_s = cfg.simulation.horizon_days * SECONDS_PER_DAY
-    legit = legit_session_specs(cfg, engine, registry, 1200)
+    legit = legit_session_specs(cfg, engine, registry, n_legit)
     genomes = [
         genome_from_template("social_engineering", "AF-09", {}),
         genome_from_template("account_takeover", "AF-05", {}),
     ]
-    fraud, _ = build_attack_specs(engine, registry, genomes, 120, horizon_s)
+    fraud, _ = build_attack_specs(engine, registry, genomes, 700, horizon_s)
     df = pd.DataFrame(engine.simulate(legit + fraud).transactions).sort_values("ts").reset_index(drop=True)
     n = len(df)
     a, b = int(n * 0.7), int(n * 0.85)

@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from ..paths import REPORTS_DIR  # noqa: E402
-
 _MARGINAL_FEATURES = [
     "amount_minor",
     "velocity_24h",
@@ -172,7 +170,9 @@ def write_fidelity_report(out_dir: Path, transactions: list[dict]) -> Path:
             lines.append(f"![{p}]({p})")
     report = "\n".join(lines) + "\n"
 
+    # Only into the run's own directory. This used to also write a copy to the
+    # repository-level reports/ root, which meant every test run and every demo
+    # mutated a tracked file, and the stale copy that got committed reported a
+    # 150-row twin with zero fraud alongside a write-up quoting the real run.
     (out_dir / "fidelity_report.md").write_text(report, encoding="utf-8")
-    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    (REPORTS_DIR / "fidelity_report.md").write_text(report, encoding="utf-8")
     return out_dir / "fidelity_report.md"

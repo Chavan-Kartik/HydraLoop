@@ -1,0 +1,10 @@
+{
+  "run_id": "example_coevolution",
+  "generations": 4,
+  "escape_rate_start": 1.0,
+  "escape_rate_end": 0.2273,
+  "promotions": 1,
+  "rollbacks": 4,
+  "total_escapes": 74,
+  "best_archive_recall": 0.6591
+}

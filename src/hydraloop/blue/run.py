@@ -73,7 +73,8 @@ def train_baseline(cfg: Config, run_id: str) -> Path:
     detector = Detector(seed=cfg.simulation.seed).fit(train_df, val_df)
     detector.save(out / "detector.pkl")
 
-    scores = detector.score(test_df)
+    scores = detector.score_raw(test_df)
+    prob = detector.score(test_df)
     y_true = true_labels(test_df)
     y_obs = observed_labels(test_df)
     value = test_df["amount_minor"].astype(float).to_numpy()
@@ -86,8 +87,12 @@ def train_baseline(cfg: Config, run_id: str) -> Path:
     # stop). The ML-vs-rule comparison and calibration are judged against the
     # observed (disputed) label, which is what both models were trained to
     # predict and what a bank actually optimises.
-    ml_true = full_report(y_true, scores, value, review_k, prob=scores)
-    ml_obs = full_report(y_obs, scores, value, review_k, prob=scores)
+    #
+    # Ranking uses the raw score and calibration is measured on the isotonic
+    # probability. Passing the calibrated score as both silently caps the achievable
+    # operating points at the number of isotonic plateaus.
+    ml_true = full_report(y_true, scores, value, review_k, prob=prob)
+    ml_obs = full_report(y_obs, scores, value, review_k, prob=prob)
     rule_true = full_report(y_true, rule_scores, value, review_k, prob=rule_scores)
     rule_obs = full_report(y_obs, rule_scores, value, review_k, prob=rule_scores)
 
@@ -95,7 +100,8 @@ def train_baseline(cfg: Config, run_id: str) -> Path:
     plot_name = _reliability_plot(out, ml_obs["reliability"])
     ml_beats_rule = bool(ml_obs["pr_auc"] >= rule_obs["pr_auc"])
 
-    _write_investigations(out, detector, test_df, scores)
+    # Calibrated probability, not the raw margin: the analyst reads this number.
+    _write_investigations(out, detector, test_df, prob)
 
     result = {
         "run_id": run_id,

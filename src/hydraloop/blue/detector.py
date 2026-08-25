@@ -31,6 +31,19 @@ class Detector:
         raw = self.model.predict_proba(feature_matrix(df))
         return self.calibrator.transform(raw)
 
+    def score_raw(self, df: pd.DataFrame) -> np.ndarray:
+        """Uncalibrated model output, for choosing an operating threshold.
+
+        Isotonic calibration is monotone, so it preserves ranking in principle, but
+        fitted on a few thousand rows it is a step function with only a handful of
+        distinct levels. That destroys resolution exactly where it matters -- among
+        the highest-scoring rows -- so no threshold on the calibrated score can hit a
+        1% FPR target: the nearest achievable operating points straddle it. Rank and
+        threshold on this; use ``score`` for the expected-loss decision and for
+        reporting calibration quality.
+        """
+        return self.model.predict_proba(feature_matrix(df))
+
     def score_row(self, features: dict[str, float | None]) -> float:
         row = np.array(
             [float(features.get(f) if features.get(f) is not None else np.nan)

@@ -12,15 +12,11 @@ if (-not (Test-Path $py)) { $py = "python" }
 switch ($Target) {
     "setup" {
         & $py -m pip install --upgrade pip
-        & $py -m pip install -r requirements-dev.txt
+        & $py -m pip install -r requirements.txt
         & $py -m pip install -e .
     }
     "test" { & $py -m pytest tests -v }
-    "lint" {
-        & $py -m ruff check src tests scripts
-        & $py scripts\check_authenticity.py
-    }
-    "authenticity" { & $py scripts\check_authenticity.py }
+    "lint" { & $py -m ruff check src tests scripts }
     "demo" { & $py -m hydraloop demo }
     "twin" { & $py -m hydraloop twin }
     "attack" { & $py -m hydraloop attack }

@@ -1,0 +1,84 @@
+{
+  "n_test": 9279,
+  "test_fraud_true": 261,
+  "ece_observed_equal_mass": 0.001608598646336123,
+  "realistic_prevalence": 0.005,
+  "ml_vs_true": {
+    "pr_auc": 0.9587,
+    "roc_auc": 0.9963,
+    "recall_at_fpr_1pct": 0.9425,
+    "value_detection_rate_at_fpr_1pct": 0.9719,
+    "confusion": {
+      "tp": 246,
+      "fp": 90,
+      "fn": 15,
+      "tn": 8928
+    },
+    "precision_at_test_prevalence": 0.7321,
+    "recall": 0.9425,
+    "f1_at_test_prevalence": 0.8241,
+    "realised_fpr": 0.00998,
+    "test_prevalence": 0.02813,
+    "precision_at_realistic_prevalence": 0.3218
+  },
+  "rule_vs_true": {
+    "pr_auc": 0.212,
+    "roc_auc": 0.8852,
+    "recall_at_fpr_1pct": 0.2184,
+    "value_detection_rate_at_fpr_1pct": 0.1968,
+    "confusion": {
+      "tp": 57,
+      "fp": 90,
+      "fn": 204,
+      "tn": 8928
+    },
+    "precision_at_test_prevalence": 0.3878,
+    "recall": 0.2184,
+    "f1_at_test_prevalence": 0.2794,
+    "realised_fpr": 0.00998,
+    "test_prevalence": 0.02813,
+    "precision_at_realistic_prevalence": 0.0991
+  },
+  "ml_vs_observed": {
+    "pr_auc": 0.5924,
+    "roc_auc": 0.9109,
+    "recall_at_fpr_1pct": 0.7422,
+    "value_detection_rate_at_fpr_1pct": 0.9001,
+    "confusion": {
+      "tp": 167,
+      "fp": 90,
+      "fn": 58,
+      "tn": 8964
+    },
+    "precision_at_test_prevalence": 0.6498,
+    "recall": 0.7422,
+    "f1_at_test_prevalence": 0.6929,
+    "realised_fpr": 0.00994,
+    "test_prevalence": 0.02425,
+    "precision_at_realistic_prevalence": 0.2728
+  },
+  "rule_vs_observed": {
+    "pr_auc": 0.1239,
+    "roc_auc": 0.8015,
+    "recall_at_fpr_1pct": 0.1333,
+    "value_detection_rate_at_fpr_1pct": 0.1291,
+    "confusion": {
+      "tp": 30,
+      "fp": 90,
+      "fn": 195,
+      "tn": 8964
+    },
+    "precision_at_test_prevalence": 0.25,
+    "recall": 0.1333,
+    "f1_at_test_prevalence": 0.1739,
+    "realised_fpr": 0.00994,
+    "test_prevalence": 0.02425,
+    "precision_at_realistic_prevalence": 0.0631
+  },
+  "config": {
+    "legit": 60000,
+    "horizon_days": 120,
+    "fraud_rate_target": 0.03,
+    "seed": 42
+  }
+}

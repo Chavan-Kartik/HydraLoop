@@ -13,7 +13,8 @@
         "social_engineering",
         "merchant_abuse",
         "card_testing",
-        "money_movement"
+        "money_movement",
+        "agentic_commerce"
       ]
     },
     "payment_surface": {

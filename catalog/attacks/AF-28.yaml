@@ -1,0 +1,33 @@
+attack_id: AF-28
+attack_name: "Payment-agent destination redirection"
+family: agentic_commerce
+payment_surface: [a2a, wallet_topup]
+genai_role: >
+  Hypothesised redirection of an otherwise legitimate payment agent so that
+  funds route to attacker-controlled payees. We model only the behavioural
+  footprint of sudden payee-novelty and rapid layering after a period of
+  normal agent activity; no injected instructions or content are represented.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "A trusted agent history precedes a burst of novel-payee transfers"
+  - "Redirected funds fan out through short layering chains"
+behavioral_signals:
+  - payee_novelty_rate
+  - layering_chain_depth
+  - trusted_history_then_burst
+  - inter_arrival_regularity
+detection_hypotheses: [payee_redirection_anomaly, layering_signature]
+mitigation_options: [payee_cooling_off_hold, manual_review, delay_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No injected instructions or content; payee-novelty and layering parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "45_54", target_side: account}
+  amount_policy: {type: ladder, base: balance, steps: [0.2, 0.4, 0.6], max_fraction: 0.7}
+  timing_policy: {inter_txn_delay_mu: 1.0, inter_txn_delay_sigma: 0.3, dwell_before_cashout_h: 0.5}
+  device_policy: {reuse: victim_device, tamper: false, device_count: 1}
+  channel_mix: {weights: {a2a: 0.7, wallet: 0.2, card_not_present: 0.1}}
+  network_topology: {mule_fanout: 4, mule_fanin: 1, layering_depth: 3}
+  friction_response: {abandon_prob: 0.15, retry_after_h: 1.0, max_retries: 4}
+  resource_budget: {mule_accounts: 4, synthetic_identities: 0, devices: 1, operator_hours: 1.0}

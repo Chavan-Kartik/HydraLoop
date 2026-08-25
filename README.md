@@ -53,6 +53,11 @@ Requires Python 3.11+ (3.12 recommended).
 make setup            # Linux / macOS / CI
 .\make.ps1 setup      # Windows PowerShell
 
+# Or without a task runner. requirements.txt is the pinned lock that reproduces
+# the reported numbers; pyproject.toml is the loose declaration.
+pip install -r requirements.txt && pip install -e .
+pip install -e ".[dev]"    # unpinned alternative
+
 # End-to-end smoke run (manifest -> twin -> attacks -> baseline -> short loop).
 make demo
 .\make.ps1 demo
@@ -77,11 +82,17 @@ cd ui && npm install && npm run dev
 
 The UI renders from the live backend and falls back to a pre-seeded snapshot
 under `ui/public/seed/` when the backend is unreachable, so it demos with the
-venue wifi dead. Six screens: Arena (live loop), Threat Board (the abstracted
-catalog), Attack Genome Lineage (mutation trail with plain-English briefs),
-Investigation (SHAP reason codes plus counterfactual), Scoreboard (metrics),
-and Governance (hash-chained audit trail with a live verify button). A "Judge
-Demo Mode" button narrates the loop beat by beat.
+venue wifi dead. Seven screens:
+
+| Screen | What it shows |
+|---|---|
+| Lab (`/`) | Type any threat description and watch Identify to Detect run step by step |
+| Arena | Recorded multi-generation co-evolution replay |
+| Threats | The abstracted catalog of 28 scenarios; each card runs in the Lab |
+| Lineage | Genome mutation trail with plain-English briefs |
+| Cases | SHAP reason codes plus a counterfactual for the latest episode |
+| Metrics | Escape rate and archive recall by generation |
+| Audit | Hash-chained ledger with a live verify button |
 
 Regenerate the offline seed snapshots after changing projections:
 
@@ -92,16 +103,28 @@ python scripts/seed_ui.py
 ### Docker
 
 ```bash
-docker compose up --build
+docker compose up --build          # backend on http://localhost:8000
 ```
 
-This runs the demo and writes artefacts (including `run_manifest.json`) into `reports/`.
+The image serves the API, which is what the UI needs. It omits torch, because the
+only component that imports it is the defence-stack sequence model, reachable
+through the `stack` and `evaluate` commands rather than any API route. To run a
+CLI stage in the container instead:
+
+```bash
+docker compose run --rm api python -m hydraloop demo
+```
+
+The same image deploys unchanged to any container host. It listens on `$PORT`,
+defaulting to 7860 so it runs on Hugging Face Spaces without modification. Set
+`HYDRALOOP_ALLOWED_ORIGINS` to a comma-separated list of front-end origins;
+`*.vercel.app` is already permitted.
 
 ### Tests
 
 ```bash
 make test        # or: python -m pytest tests -v
-make lint        # ruff + authenticity gate
+make lint        # ruff
 ```
 
 ## Layout

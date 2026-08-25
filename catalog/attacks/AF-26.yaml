@@ -1,0 +1,32 @@
+attack_id: AF-26
+attack_name: "Autonomous checkout session takeover"
+family: agentic_commerce
+payment_surface: [card_not_present, wallet_topup]
+genai_role: >
+  Hypothesised takeover of an autonomous checkout agent that already holds a
+  stored payment instrument. We simulate only the behavioural footprint of a
+  hijacked agent session driving purchases at machine cadence; no session
+  tokens, credentials, or exploit steps are represented.
+abstraction_level: behavioral_metadata_only
+assumptions:
+  - "A hijacked agent reuses a bound device but changes destination merchants"
+  - "Purchase bursts follow login with near-zero human latency"
+behavioral_signals:
+  - login_to_payment_latency
+  - merchant_destination_shift
+  - failed_then_success_burst
+  - inter_arrival_regularity
+detection_hypotheses: [session_automation_signature, destination_anomaly]
+mitigation_options: [step_up_3ds, device_binding, rate_limit_hold]
+risk_level: high
+validation_status: unverified_hypothetical
+harm_review: "No session tokens, credentials, or exploit steps; timing and destination parameters only."
+evolvable: true
+genome_template:
+  victim_selection: {age_band: "25_34", target_side: account}
+  amount_policy: {type: flat, base: balance, steps: [0.25], max_fraction: 0.4}
+  timing_policy: {inter_txn_delay_mu: 0.6, inter_txn_delay_sigma: 0.15, dwell_before_cashout_h: 0.1}
+  device_policy: {reuse: victim_device, tamper: false, device_count: 1}
+  channel_mix: {weights: {a2a: 0.1, wallet: 0.5, card_not_present: 0.4}}
+  friction_response: {abandon_prob: 0.35, retry_after_h: 0.5, max_retries: 5}
+  resource_budget: {mule_accounts: 1, synthetic_identities: 0, devices: 1, operator_hours: 0.5}

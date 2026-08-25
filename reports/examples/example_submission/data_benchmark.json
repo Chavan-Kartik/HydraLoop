@@ -1,0 +1,41 @@
+{
+  "n_synthetic": 60292,
+  "n_reference": 60292,
+  "shared_feature_count": 18,
+  "discriminator_auc": 0.5005796332015194,
+  "marginal_divergences": [
+    {
+      "feature": "amount_minor",
+      "ks": 0.006899754527963875,
+      "wasserstein": 128.7989948915221
+    },
+    {
+      "feature": "velocity_24h",
+      "ks": 0.0020732435480660394,
+      "wasserstein": 0.002272274928680429
+    },
+    {
+      "feature": "hour_of_day",
+      "ks": 0.005324089431433698,
+      "wasserstein": 0.03393217993950088
+    },
+    {
+      "feature": "day_of_week",
+      "ks": 0.0026205798447554995,
+      "wasserstein": 0.012489219133549945
+    },
+    {
+      "feature": "account_age_days",
+      "ks": 0.0036986664897499244,
+      "wasserstein": 0.6796134793125678
+    }
+  ],
+  "tstr_recall_at_fpr_1pct": 0.8075601374570447,
+  "trts_recall_at_fpr_1pct": 0.6438356164383562,
+  "transfer_note": "TSTR trains on synthetic and tests on the reference; TRTS is the reverse.",
+  "mode": "synthetic_shift",
+  "reference_source": "synthetic_shift",
+  "interpretation": "hard to distinguish from the reference (strong marginal fidelity)",
+  "measures_realism": false,
+  "claim": "stationarity across independent draws of the same generator; this is NOT a measurement of resemblance to real payment data"
+}

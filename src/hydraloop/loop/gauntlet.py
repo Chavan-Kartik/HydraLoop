@@ -31,9 +31,21 @@ class GauntletResult:
 
 
 def _threshold_at_fpr(scores: np.ndarray, fpr_target: float) -> float:
+    """Lowest threshold whose realised FPR stays inside the budget.
+
+    A plain ``quantile`` is wrong here: isotonic calibration maps many rows onto
+    the same value, so the quantile lands mid-plateau and ``scores >= threshold``
+    then flags every tied row -- several times the intended budget. Walking the
+    unique values instead keeps the operating point inside the budget by
+    construction, at the cost of being conservative when a plateau straddles it.
+    """
     if len(scores) == 0:
         return 0.5
-    return float(np.quantile(scores, 1.0 - fpr_target))
+    unique = np.unique(scores)
+    for candidate in unique:
+        if float(np.mean(scores >= candidate)) <= fpr_target:
+            return float(candidate)
+    return float(np.nextafter(unique[-1], np.inf))
 
 
 def _recall_at_threshold(detector: Detector, fraud_df: pd.DataFrame, thr: float) -> float:

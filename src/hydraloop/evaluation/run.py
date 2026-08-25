@@ -17,8 +17,8 @@ from ..blue.detector import Detector
 from ..blue.ensemble import EnsembleDetector
 from ..config import Config
 from ..paths import run_dir
+from .data_adapter import run_data_benchmark
 from .drift import DriftMonitor
-from .fidelity import discriminator_auc, marginal_divergences
 from .lofo import build_family_frames, transfer_matrix
 from .sensitivity import Assumption, plot_tornado, sweep
 from .zeroday import adversarial_escape_rate, zeroday_split
@@ -85,16 +85,17 @@ def run_evaluation(cfg: Config, run_id: str) -> Path:
 
     drift = _drift_probe(legit_df)
 
-    # Fidelity: with no external reference, compare two independent synthetic draws
-    # (documented credential-free fallback), so the discriminator should be ~0.5.
-    shuffled = legit_df.sample(frac=1.0, random_state=cfg.simulation.seed).reset_index(drop=True)
-    mid = len(shuffled) // 2
-    ref_split, synth_split = shuffled.iloc[:mid], shuffled.iloc[mid:]
-    fidelity = {
-        "discriminator_auc": discriminator_auc(ref_split, synth_split),
-        "reference": "credential-free fallback: synthetic split (no external dataset bundled)",
-        "marginals": marginal_divergences(ref_split, synth_split),
-    }
+    # Fidelity has to be measured against a reference drawn from *different*
+    # priors. Shuffling one frame and splitting it in half, which this used to do,
+    # asks a discriminator to separate two samples that are identically distributed
+    # by construction: it always returns roughly 0.5 and is evidence of nothing.
+    # The shifted-prior twin is a real reference, and `hydraloop bench --csv`
+    # swaps in a licensed external dataset when one is available.
+    fidelity = run_data_benchmark(cfg, out_dir=out)
+    fidelity["reference"] = (
+        f"{fidelity['mode']}: no external dataset is bundled (licensing), so the "
+        "reference is an independently-parameterised twin, not real payment data"
+    )
 
     tornado_rows, base = _sensitivity(cfg)
     tornado_path = out / "sensitivity_tornado.png"
@@ -135,7 +136,12 @@ def run_evaluation(cfg: Config, run_id: str) -> Path:
         f"{drift['stable']['flagged']}), injected-shift PSI "
         f"{drift['injected_shift']['psi']:.3f} (flag {drift['injected_shift']['flagged']})"
     )
-    lines.append(f"- fidelity discriminator AUC (fallback): {fidelity['discriminator_auc']}")
+    lines.append(
+        f"- fidelity vs {fidelity['reference_source']} reference: discriminator AUC "
+        f"{fidelity['discriminator_auc']:.3f} ({fidelity['interpretation']}); "
+        f"TSTR {fidelity.get('tstr_recall_at_fpr_1pct')} / "
+        f"TRTS {fidelity.get('trts_recall_at_fpr_1pct')} recall@1%FPR"
+    )
     lines.append("")
     lines.append("## Sensitivity tornado (+/-50%)")
     lines.append("")

@@ -15,6 +15,7 @@ _FAMILY_PHRASE = {
     "merchant_abuse": "a merchant-side abuse scheme",
     "card_testing": "a card-testing and enumeration campaign",
     "money_movement": "a money-movement and layering scheme",
+    "agentic_commerce": "an autonomous agent-initiated payment scheme",
 }
 
 

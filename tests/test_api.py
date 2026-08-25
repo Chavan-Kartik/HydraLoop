@@ -48,6 +48,19 @@ def client():
     return TestClient(app_module.app)
 
 
+def test_root_points_at_the_ui(client):
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "127.0.0.1:3000" in res.text
+    assert "API" in res.text
+
+
+def test_run_status_unknown_is_honest(client):
+    data = client.get("/api/run/does_not_exist").json()
+    assert data["status"] == "unknown"
+    assert data["event_count"] == 0
+
+
 def test_health_and_runs(client, seeded_run):
     assert client.get("/api/health").json()["status"] == "ok"
     runs = client.get("/api/runs").json()["runs"]

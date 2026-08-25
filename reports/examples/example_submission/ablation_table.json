@@ -1,0 +1,48 @@
+{
+  "run_id": "run_sub_stack",
+  "ablation": [
+    {
+      "model": "tabular",
+      "pr_auc_observed": 0.5957,
+      "recall_at_fpr_observed": 0.7455,
+      "pr_auc_true": 0.9598,
+      "recall_at_fpr_true": 0.9425
+    },
+    {
+      "model": "sequence",
+      "pr_auc_observed": 0.3786,
+      "recall_at_fpr_observed": 0.5089,
+      "pr_auc_true": 0.586,
+      "recall_at_fpr_true": 0.5939
+    },
+    {
+      "model": "graph",
+      "pr_auc_observed": 0.0313,
+      "recall_at_fpr_observed": 0.0,
+      "pr_auc_true": 0.0386,
+      "recall_at_fpr_true": 0.0
+    },
+    {
+      "model": "narrative",
+      "pr_auc_observed": 0.4424,
+      "recall_at_fpr_observed": 0.433,
+      "pr_auc_true": 0.6472,
+      "recall_at_fpr_true": 0.5517
+    },
+    {
+      "model": "sentinel",
+      "pr_auc_observed": 0.4381,
+      "recall_at_fpr_observed": 0.4286,
+      "pr_auc_true": 0.6451,
+      "recall_at_fpr_true": 0.6169
+    },
+    {
+      "model": "ensemble",
+      "pr_auc_observed": 0.5957,
+      "recall_at_fpr_observed": 0.7455,
+      "pr_auc_true": 0.9598,
+      "recall_at_fpr_true": 0.9425
+    }
+  ],
+  "sentinel_zeroday_solo_recall_at_fpr_1pct": 0.5024311183144247
+}

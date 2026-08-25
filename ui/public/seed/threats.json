@@ -1,0 +1,721 @@
+{
+  "threats": [
+    {
+      "attack_id": "AF-01",
+      "attack_name": "GenAI-assisted identity coherence at onboarding",
+      "family": "synthetic_identity",
+      "family_label": "Synthetic Identity",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_onboarding",
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "field_coherence_zscore",
+        "attribute_reuse_across_applications",
+        "onboarding_velocity_per_device",
+        "contactability_gap_flag"
+      ],
+      "mitigation_options": [
+        "enhanced_kyc_stepup",
+        "cooling_off_hold",
+        "device_reputation_check"
+      ]
+    },
+    {
+      "attack_id": "AF-02",
+      "attack_name": "Synthetic-identity bust-out after cultivation",
+      "family": "synthetic_identity",
+      "family_label": "Synthetic Identity",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "account_to_account_transfer"
+      ],
+      "behavioral_signals": [
+        "dormancy_then_spike_flag",
+        "amount_ladder_slope",
+        "limit_utilisation_percentile",
+        "new_payee_burst"
+      ],
+      "mitigation_options": [
+        "dynamic_limit",
+        "cooling_off_hold",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-03",
+      "attack_name": "Fabricated-attribute onboarding fraud",
+      "family": "synthetic_identity",
+      "family_label": "Synthetic Identity",
+      "risk_level": "medium",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_onboarding"
+      ],
+      "behavioral_signals": [
+        "attribute_cluster_density",
+        "thin_file_flag",
+        "shared_contact_infrastructure",
+        "onboarding_time_of_day_anomaly"
+      ],
+      "mitigation_options": [
+        "enhanced_kyc_stepup",
+        "third_party_verification"
+      ]
+    },
+    {
+      "attack_id": "AF-04",
+      "attack_name": "First-party synthetic blend (real-plus-fabricated)",
+      "family": "synthetic_identity",
+      "family_label": "Synthetic Identity",
+      "risk_level": "medium",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_onboarding",
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "partial_verification_pattern",
+        "verifiable_vs_unverifiable_gap",
+        "repeat_attribute_across_accounts",
+        "low_genuine_engagement"
+      ],
+      "mitigation_options": [
+        "step_up_verification",
+        "graph_linkage_review"
+      ]
+    },
+    {
+      "attack_id": "AF-05",
+      "attack_name": "Credential stuffing at machine speed",
+      "family": "account_takeover",
+      "family_label": "Account Takeover",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "login_to_payment_latency",
+        "device_rotation_rate",
+        "failed_then_success_burst",
+        "asn_diversity_zscore"
+      ],
+      "mitigation_options": [
+        "step_up_3ds",
+        "rate_limit_hold",
+        "device_binding"
+      ]
+    },
+    {
+      "attack_id": "AF-06",
+      "attack_name": "Post-authentication session hijack",
+      "family": "account_takeover",
+      "family_label": "Account Takeover",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "behaviour_vs_baseline_zscore",
+        "new_payee_created_minutes_before_payment",
+        "navigation_entropy_shift",
+        "amount_relative_to_balance_percentile"
+      ],
+      "mitigation_options": [
+        "payee_verification_stepup",
+        "cooling_off_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-07",
+      "attack_name": "Automation-driven account navigation and drain",
+      "family": "account_takeover",
+      "family_label": "Account Takeover",
+      "risk_level": "medium",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "inter_action_timing_regularity",
+        "rare_path_coverage",
+        "hesitation_events_absent",
+        "amount_probe_sequence"
+      ],
+      "mitigation_options": [
+        "step_up_3ds",
+        "soft_warn",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-08",
+      "attack_name": "Recovery-channel abuse enabled takeover",
+      "family": "account_takeover",
+      "family_label": "Account Takeover",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer"
+      ],
+      "behavioral_signals": [
+        "recent_contact_change_flag",
+        "recovery_event_to_payment_latency",
+        "new_device_after_recovery",
+        "amount_relative_to_balance_percentile"
+      ],
+      "mitigation_options": [
+        "cooling_off_hold",
+        "payee_verification_stepup"
+      ]
+    },
+    {
+      "attack_id": "AF-09",
+      "attack_name": "LLM-orchestrated authorised push payment (APP) scam funnel",
+      "family": "social_engineering",
+      "family_label": "Social Engineering",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "new_payee_created_minutes_before_payment",
+        "session_duration_vs_user_baseline_zscore",
+        "concurrent_inbound_call_flag",
+        "hesitation_events",
+        "amount_relative_to_balance_percentile"
+      ],
+      "mitigation_options": [
+        "dynamic_warning",
+        "cooling_off_hold",
+        "payee_verification_stepup"
+      ]
+    },
+    {
+      "attack_id": "AF-10",
+      "attack_name": "Romance and investment grooming funnel",
+      "family": "social_engineering",
+      "family_label": "Social Engineering",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "escalating_amount_trend",
+        "repeated_beneficiary_flag",
+        "cross_session_persistence",
+        "amount_relative_to_income_proxy"
+      ],
+      "mitigation_options": [
+        "dynamic_warning",
+        "cooling_off_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-11",
+      "attack_name": "Deepfake-voice urgency payment (metadata proxy)",
+      "family": "social_engineering",
+      "family_label": "Social Engineering",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer"
+      ],
+      "behavioral_signals": [
+        "concurrent_inbound_call_flag",
+        "compressed_decision_window",
+        "first_time_beneficiary_flag",
+        "out_of_hours_flag"
+      ],
+      "mitigation_options": [
+        "cooling_off_hold",
+        "dynamic_warning",
+        "payee_verification_stepup"
+      ]
+    },
+    {
+      "attack_id": "AF-12",
+      "attack_name": "Impersonation of institution support",
+      "family": "social_engineering",
+      "family_label": "Social Engineering",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "safe_account_sweep_pattern",
+        "new_payee_created_minutes_before_payment",
+        "full_balance_transfer_flag",
+        "hesitation_events"
+      ],
+      "mitigation_options": [
+        "cooling_off_hold",
+        "dynamic_warning"
+      ]
+    },
+    {
+      "attack_id": "AF-13",
+      "attack_name": "Shell / ghost merchant",
+      "family": "merchant_abuse",
+      "family_label": "Merchant Abuse",
+      "risk_level": "medium",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "merchant_acquiring"
+      ],
+      "behavioral_signals": [
+        "merchant_tenure_days",
+        "category_mix_divergence",
+        "approval_to_refund_ratio",
+        "repeated_cardholder_concentration"
+      ],
+      "mitigation_options": [
+        "merchant_review",
+        "settlement_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-14",
+      "attack_name": "Transaction laundering through a front merchant",
+      "family": "merchant_abuse",
+      "family_label": "Merchant Abuse",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "merchant_acquiring"
+      ],
+      "behavioral_signals": [
+        "unrelated_cardholder_fan_in",
+        "amount_uniformity_index",
+        "geo_dispersion_vs_merchant_locale",
+        "settlement_timing_regularity"
+      ],
+      "mitigation_options": [
+        "settlement_hold",
+        "merchant_review",
+        "graph_linkage_review"
+      ]
+    },
+    {
+      "attack_id": "AF-15",
+      "attack_name": "Refund and chargeback abuse",
+      "family": "merchant_abuse",
+      "family_label": "Merchant Abuse",
+      "risk_level": "medium",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "merchant_acquiring"
+      ],
+      "behavioral_signals": [
+        "refund_latency_distribution",
+        "repeat_disputer_index",
+        "refund_to_capture_ratio",
+        "cross_merchant_dispute_spread"
+      ],
+      "mitigation_options": [
+        "refund_hold",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-16",
+      "attack_name": "Collusive merchant bust-out",
+      "family": "merchant_abuse",
+      "family_label": "Merchant Abuse",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "merchant_acquiring",
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "settlement_volume_spike",
+        "trust_period_duration",
+        "post_spike_inactivity",
+        "chargeback_lag_after_spike"
+      ],
+      "mitigation_options": [
+        "settlement_hold",
+        "merchant_review"
+      ]
+    },
+    {
+      "attack_id": "AF-17",
+      "attack_name": "GenAI-tuned card-testing probing schedule",
+      "family": "card_testing",
+      "family_label": "Card Testing",
+      "risk_level": "medium",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "micro_amount_ratio",
+        "probe_cadence_adaptivity",
+        "merchant_hopping_rate",
+        "decline_then_retry_pattern"
+      ],
+      "mitigation_options": [
+        "rate_limit_hold",
+        "step_up_3ds",
+        "decline"
+      ]
+    },
+    {
+      "attack_id": "AF-18",
+      "attack_name": "Distributed low-value validation across devices",
+      "family": "card_testing",
+      "family_label": "Card Testing",
+      "risk_level": "medium",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "per_device_low_count",
+        "fleet_wide_amount_signature",
+        "asn_diversity_zscore",
+        "success_ratio_across_fleet"
+      ],
+      "mitigation_options": [
+        "fleet_rate_limit",
+        "step_up_3ds"
+      ]
+    },
+    {
+      "attack_id": "AF-19",
+      "attack_name": "BIN-range enumeration",
+      "family": "card_testing",
+      "family_label": "Card Testing",
+      "risk_level": "medium",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "range_coverage_density",
+        "sequential_pattern_index",
+        "short_window_burst",
+        "low_success_density"
+      ],
+      "mitigation_options": [
+        "rate_limit_hold",
+        "decline"
+      ]
+    },
+    {
+      "attack_id": "AF-20",
+      "attack_name": "Subscription-trial validation abuse",
+      "family": "card_testing",
+      "family_label": "Card Testing",
+      "risk_level": "low",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "merchant_acquiring"
+      ],
+      "behavioral_signals": [
+        "trial_auth_ratio",
+        "conversion_to_recurring_rate",
+        "merchant_trial_concentration",
+        "card_reuse_across_trials"
+      ],
+      "mitigation_options": [
+        "step_up_3ds",
+        "merchant_review"
+      ]
+    },
+    {
+      "attack_id": "AF-21",
+      "attack_name": "Mule-network fan-out cash-out",
+      "family": "money_movement",
+      "family_label": "Money Movement",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "fan_out_degree",
+        "mule_account_age_hours",
+        "dwell_before_cashout",
+        "reconvergence_at_cashout"
+      ],
+      "mitigation_options": [
+        "cooling_off_hold",
+        "graph_linkage_review",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-22",
+      "attack_name": "Smurfing and structuring below thresholds",
+      "family": "money_movement",
+      "family_label": "Money Movement",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer"
+      ],
+      "behavioral_signals": [
+        "just_below_threshold_ratio",
+        "transfer_count_per_window",
+        "beneficiary_reuse_index",
+        "amount_rounding_signature"
+      ],
+      "mitigation_options": [
+        "aggregate_velocity_hold",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-23",
+      "attack_name": "Rapid layering across rails",
+      "family": "money_movement",
+      "family_label": "Money Movement",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "cross_rail_hop_count",
+        "hop_interval_distribution",
+        "value_preservation_across_hops",
+        "terminal_cashout_concentration"
+      ],
+      "mitigation_options": [
+        "graph_linkage_review",
+        "cooling_off_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-24",
+      "attack_name": "Fan-in consolidation before cash-out",
+      "family": "money_movement",
+      "family_label": "Money Movement",
+      "risk_level": "high",
+      "evolvable": false,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "account_to_account_transfer"
+      ],
+      "behavioral_signals": [
+        "fan_in_degree",
+        "consolidation_to_cashout_latency",
+        "source_account_age_spread",
+        "terminal_account_concentration"
+      ],
+      "mitigation_options": [
+        "graph_linkage_review",
+        "cooling_off_hold",
+        "manual_review"
+      ]
+    },
+    {
+      "attack_id": "AF-25",
+      "attack_name": "Delegated payment-agent mandate drift",
+      "family": "agentic_commerce",
+      "family_label": "Agentic Commerce",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "inter_arrival_regularity",
+        "value_escalation_without_dwell",
+        "session_automation_signature",
+        "payee_novelty_rate"
+      ],
+      "mitigation_options": [
+        "mandate_ceiling_hold",
+        "step_up_3ds",
+        "cooling_off_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-26",
+      "attack_name": "Autonomous checkout session takeover",
+      "family": "agentic_commerce",
+      "family_label": "Agentic Commerce",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "login_to_payment_latency",
+        "merchant_destination_shift",
+        "failed_then_success_burst",
+        "inter_arrival_regularity"
+      ],
+      "mitigation_options": [
+        "step_up_3ds",
+        "device_binding",
+        "rate_limit_hold"
+      ]
+    },
+    {
+      "attack_id": "AF-27",
+      "attack_name": "Agent-swarm micro-authorisation probing",
+      "family": "agentic_commerce",
+      "family_label": "Agentic Commerce",
+      "risk_level": "medium",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "card_not_present"
+      ],
+      "behavioral_signals": [
+        "device_rotation_rate",
+        "low_value_probe_density",
+        "asn_diversity_zscore",
+        "inter_arrival_regularity"
+      ],
+      "mitigation_options": [
+        "rate_limit_hold",
+        "device_reputation_check",
+        "soft_warn"
+      ]
+    },
+    {
+      "attack_id": "AF-28",
+      "attack_name": "Payment-agent destination redirection",
+      "family": "agentic_commerce",
+      "family_label": "Agentic Commerce",
+      "risk_level": "high",
+      "evolvable": true,
+      "validation_status": "unverified_hypothetical",
+      "abstraction_level": "behavioral_metadata_only",
+      "payment_surface": [
+        "a2a",
+        "wallet_topup"
+      ],
+      "behavioral_signals": [
+        "payee_novelty_rate",
+        "layering_chain_depth",
+        "trusted_history_then_burst",
+        "inter_arrival_regularity"
+      ],
+      "mitigation_options": [
+        "payee_cooling_off_hold",
+        "manual_review",
+        "delay_hold"
+      ]
+    }
+  ],
+  "families": [
+    {
+      "family": "synthetic_identity",
+      "label": "Synthetic Identity",
+      "count": 4
+    },
+    {
+      "family": "account_takeover",
+      "label": "Account Takeover",
+      "count": 4
+    },
+    {
+      "family": "social_engineering",
+      "label": "Social Engineering",
+      "count": 4
+    },
+    {
+      "family": "merchant_abuse",
+      "label": "Merchant Abuse",
+      "count": 4
+    },
+    {
+      "family": "card_testing",
+      "label": "Card Testing",
+      "count": 4
+    },
+    {
+      "family": "money_movement",
+      "label": "Money Movement",
+      "count": 4
+    },
+    {
+      "family": "agentic_commerce",
+      "label": "Agentic Commerce",
+      "count": 4
+    }
+  ],
+  "total": 28
+}

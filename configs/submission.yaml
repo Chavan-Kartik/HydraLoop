@@ -1,0 +1,69 @@
+project:
+  name: HydraLoop
+  mode: synthetic_sandbox
+  version: 0.1.0
+
+# The configuration every number in the submission write-up is measured on.
+#
+# Sized for statistical power rather than speed. The train/test split is temporal,
+# so the test set is the tail of the horizon, and multi-session attack episodes
+# that begin near the end are right-censored. At the 1000-session default the test
+# window held single-digit fraud rows, which is not enough to quote a recall or a
+# precision from. A 120-day horizon with 60k legitimate sessions leaves a few
+# hundred fraudulent rows in test.
+#
+# fraud_rate_target is well above a real portfolio's base rate, again for power.
+# Recall and FPR do not depend on prevalence; precision does, so it is restated at
+# a realistic 0.5% base rate wherever it is reported.
+
+safety:
+  synthetic_only: true
+  live_targeting: false
+  content_generation: false
+  operational_tooling: false
+
+simulation:
+  seed: 42
+  generations: 4
+  legitimate_transactions_per_generation: 60000
+  attack_episodes_per_generation: 240
+  fraud_rate_target: 0.03
+  label_delay_enabled: true
+  label_delay_hours_mean: 48
+  label_delay_hours_std: 24
+  horizon_days: 120
+  friendly_fraud_rate: 0.005
+  under_report_rate: 0.25
+  dispute_window_days: 120
+
+payment_lifecycle:
+  enable_step_up: true
+  enable_hold: true
+  enable_decline: true
+  enable_delayed_dispute: true
+  settlement_delay_hours: 12
+
+defender:
+  model_type: lightgbm
+  calibration: isotonic
+  step_up_budget_rate: 0.02
+  daily_review_capacity: 400
+  latency_budget_ms: 150
+
+red_team:
+  mutation_rate: 0.2
+  crossover_rate: 0.1
+  elite_archive_size: 100
+  use_llm_strategist: false
+  use_quality_diversity: true
+
+evaluation:
+  primary_metric: pr_auc
+  secondary_metrics:
+    - roc_auc
+    - recall_at_fpr_0_1
+    - recall_at_fpr_0_5
+    - recall_at_fpr_1_0
+    - value_detection_rate
+    - expected_calibration_error
+    - attacker_roi

@@ -3,10 +3,95 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  background: radial-gradient(1200px 600px at 50% -10%, #1b2433 0%, #0b0e14 60%);
-  min-height: 100vh;
+  background-color: #f7f8fa;
+  color: #101828;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Figures line up in columns and never reflow as they stream in. Applied
+   globally because almost every number in this app updates live. */
+table,
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+@layer components {
+  /* The one surface primitive. Flat, hairline border, small radius. */
+  .panel {
+    @apply rounded-md border border-line bg-surface shadow-card;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-line px-3 py-2;
+  }
+
+  /* Small caps label used above dense blocks. Restrained tracking: at 0.18em it
+     reads as a marketing eyebrow rather than a field label. */
+  .label {
+    @apply text-2xs font-semibold uppercase tracking-wider text-ink-ghost;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded border border-line bg-subtle px-1.5 py-0.5 text-2xs font-medium text-ink-soft;
+  }
+
+  /* Dense console table. Right-aligned numerics are handled per-cell. */
+  .grid-table {
+    @apply w-full border-collapse text-left;
+  }
+  .grid-table th {
+    @apply border-b border-line px-3 py-1.5 text-2xs font-semibold uppercase tracking-wider text-ink-ghost;
+  }
+  .grid-table td {
+    @apply border-b border-line/70 px-3 py-1.5 text-sm text-ink-soft;
+  }
+  .grid-table tbody tr:hover {
+    @apply bg-subtle/60;
+  }
+
+  .num {
+    @apply font-mono text-sm tabular-nums;
+  }
+}
+
+@layer utilities {
+  /* Keyboard focus is visible everywhere; this is an operator tool. */
+  .focus-ring {
+    @apply outline-none ring-offset-0 focus-visible:shadow-focus;
+  }
+}
+
+/* Thin scrollbars keep dense panels from losing width to chrome. */
+.scroll-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: #d0d5dd;
+  border-radius: 4px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
