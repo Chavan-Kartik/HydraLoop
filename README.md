@@ -116,9 +116,9 @@ docker compose run --rm api python -m hydraloop demo
 ```
 
 The same image deploys unchanged to any container host. It listens on `$PORT`,
-defaulting to 7860 so it runs on Hugging Face Spaces without modification. Set
-`HYDRALOOP_ALLOWED_ORIGINS` to a comma-separated list of front-end origins;
-`*.vercel.app` is already permitted.
+which managed platforms inject for you, and falls back to 7860 when nothing sets
+it. Set `HYDRALOOP_ALLOWED_ORIGINS` to a comma-separated list of front-end
+origins; `*.vercel.app` is already permitted.
 
 ### Tests
 

@@ -39,6 +39,7 @@ COPY reports/ ./reports/
 # it here would reinstall the wheel the filter above just removed.
 RUN pip install --no-deps -e .
 
-# 7860 is the port Hugging Face Spaces expects. Override PORT for anything else.
+# Managed hosts inject PORT and the CMD below honours it; 7860 is only the
+# fallback for a plain `docker run` with nothing set.
 EXPOSE 7860
 CMD ["sh", "-c", "uvicorn hydraloop.api.app:app --host 0.0.0.0 --port ${PORT}"]
