@@ -5,16 +5,6 @@
 HydraLoop is a synthetic, sandboxed, co-evolutionary adversarial payment security lab
 for the era of **agentic commerce**.
 
-## Visual demo
-
-Add the assets below in `docs/images/` before merging this branch so judges can see
-the UI immediately when they open the repository.
-
-![Lab live run (streaming)](docs/images/lab-live-run.gif)
-![Arena loop view](docs/images/arena-loop.png)
-![Cases explainability view](docs/images/cases-explainability.png)
-![Audit hash-chain verification](docs/images/audit-chain.png)
-
 ## Why now
 
 Autonomous agents are starting to make payments on people's behalf. That collapses the

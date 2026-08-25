@@ -25,10 +25,10 @@ the KPI bar: escape rate and attacker ROI are the two numbers that matter, and b
 
 ## Beat 2 - the loop runs (45s)
 
-Let the caption walkthrough advance, or press **Start live loop** for a live run. Narrate: the red team
-escapes through specific modes (call them out from the ticker), the blue team retrains from
-immune memory, and the **regression gauntlet** blocks a model that would have regressed. That
-rollback is the point: we never ship a weaker defence.
+Let the caption walkthrough advance, or press **Start live loop** for a live run. Narrate:
+the red team escapes through specific modes (call them out from the ticker), the blue team
+retrains from immune memory, and the **regression gauntlet** blocks a model that would have
+regressed. That rollback is the point: we never ship a weaker defence.
 
 ## Beat 3 - the attack, in plain English (30s)
 
