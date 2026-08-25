@@ -23,12 +23,18 @@ from .hub import EventHub
 
 app = FastAPI(title="HydraLoop Command Center", version="1.0")
 
-# The dev server origins are always allowed. A deployed UI lives on a different
-# origin, so its URL has to be added at runtime: set HYDRALOOP_ALLOWED_ORIGINS to
-# a comma-separated list. Without this the browser blocks every call from the
-# hosted front end and the console silently falls back to its seeded snapshot,
+# Local dev on any port, plus Vercel deployments including preview builds.
+#
+# The port has to be a wildcard: `next dev` silently moves to 3001, then 3002,
+# when 3000 is already held by an earlier dev server. Pinning 3000 means the
+# preflight for the JSON POST routes is rejected with a 400, which surfaces in
+# the console as "the API is not running" while the GET routes keep returning
+# 200, because simple requests are not preflighted. That is a confusing hour.
+_ORIGIN_REGEX = r"http://(?:localhost|127\.0\.0\.1):\d+|https://[\w-]+(?:\.[\w-]+)*\.vercel\.app"
+
+# Anything else (a custom domain, say) has to be named at runtime. Without it the
+# browser blocks every call and the console falls back to its seeded snapshot,
 # which looks like a working demo but is not talking to the backend at all.
-_DEV_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
 _EXTRA_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("HYDRALOOP_ALLOWED_ORIGINS", "").split(",")
@@ -37,8 +43,8 @@ _EXTRA_ORIGINS = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_DEV_ORIGINS + _EXTRA_ORIGINS,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=_EXTRA_ORIGINS,
+    allow_origin_regex=_ORIGIN_REGEX,
     allow_methods=["*"],
     allow_headers=["*"],
 )
