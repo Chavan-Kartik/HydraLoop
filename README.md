@@ -46,7 +46,7 @@ See [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md) for the full safety and abs
 
 ## Quickstart
 
-Requires Python 3.11+ (3.12 recommended).
+Requires Python 3.11+ (3.12 recommended), and Node 18.17+ for the UI.
 
 ```bash
 # One-time setup: dev deps + editable install.
