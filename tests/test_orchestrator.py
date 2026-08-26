@@ -73,8 +73,8 @@ def test_a_configured_model_actually_proposes_genomes_in_the_loop(small_config, 
     assert audit["llm_authored"] >= 1, "no proposal was attributed to the model"
     assert audit["samples"], "the screen would have nothing to show"
 
-    # Every prompt must ask for bounded parameters, never for attack content.
-    assert all("GENOME PARAMETERS ONLY" in p for p in calls)
+    # Every prompt must ask for simulator parameters, never for attack content.
+    assert all("JSON ONLY" in p and "credentials" in p for p in calls)
 
 
 def test_a_refusing_model_does_not_break_the_loop(small_config):

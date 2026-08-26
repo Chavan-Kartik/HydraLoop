@@ -219,7 +219,17 @@ class OpenAICompatClient:
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 body = json.loads(resp.read().decode("utf-8"))
-            return str(body["choices"][0]["message"]["content"])
+            choice = body["choices"][0]
+            message = choice.get("message") or {}
+            content = message.get("content")
+            if content is None or content == "":
+                finish = choice.get("finish_reason") or body.get("error") or "empty content"
+                self.last_error = self._redact(
+                    f"provider returned no content for model '{self.model}' "
+                    f"(finish_reason={finish!r})"
+                )
+                return ""
+            return str(content)
         except urllib.error.HTTPError as exc:
             self.last_error = self._redact(
                 f"provider refused model '{self.model}' with HTTP {exc.code}: "
