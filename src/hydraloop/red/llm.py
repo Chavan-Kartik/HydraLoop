@@ -60,6 +60,36 @@ def extract_json(text: str) -> str:
     return ""
 
 
+def _http_error_detail(exc: urllib.error.HTTPError) -> str:
+    """Pull the provider's own explanation out of an error response.
+
+    These providers put the useful part in the body, not the status line: a
+    retired model name and a revoked key both arrive as a bare ``400`` whose body
+    says which one it was. Falls back to the status reason when the body is not
+    the usual ``{"error": {"message": ...}}`` shape.
+    """
+    try:
+        raw = exc.read().decode("utf-8", "replace")
+    except OSError:
+        raw = ""
+    # Worst case, hand back the raw body: still far more use than the status code.
+    fallback = raw.strip()[:300] or exc.reason or "no detail given"
+    try:
+        body = json.loads(raw)
+    except ValueError:
+        return fallback
+    # Gemini's compatibility endpoint wraps the error object in a one-element
+    # array; Groq, OpenRouter and OpenAI itself return it bare.
+    if isinstance(body, list):
+        body = next((item for item in body if isinstance(item, dict)), None)
+    if not isinstance(body, dict):
+        return fallback
+    err = body.get("error", body)
+    if isinstance(err, dict):
+        return str(err.get("message") or err.get("status") or err)[:300]
+    return str(err)[:300] or fallback
+
+
 @dataclass
 class OllamaClient:
     """Callable LLM client backed by a local Ollama server.
@@ -74,6 +104,7 @@ class OllamaClient:
     temperature: float = 0.7
     timeout: float = 30.0
     system: str | None = None
+    last_error: str = field(default="", init=False)
 
     def available(self) -> bool:
         """Cheap liveness check: is an Ollama server answering locally?"""
@@ -100,12 +131,18 @@ class OllamaClient:
             data=data,
             headers={"Content-Type": "application/json"},
         )
+        self.last_error = ""
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 body = json.loads(resp.read().decode("utf-8"))
             return str(body.get("response", ""))
-        except (urllib.error.URLError, OSError, ValueError, json.JSONDecodeError):
-            return ""
+        except urllib.error.HTTPError as exc:
+            self.last_error = f"ollama returned HTTP {exc.code}: {_http_error_detail(exc)}"
+        except (urllib.error.URLError, OSError) as exc:
+            self.last_error = f"no ollama server at {self.base_url}: {exc}"
+        except ValueError as exc:
+            self.last_error = f"could not read ollama's reply: {exc!r}"
+        return ""
 
 
 @dataclass
@@ -122,8 +159,15 @@ class OpenAICompatClient:
     call, which degrades to the keyword mapper silently. Asking for JSON in the
     prompt and recovering it with :func:`extract_json` is portable instead.
 
+    ``reasoning_effort`` follows the same rule and defaults to unset. It matters
+    for reasoning models, which spend thinking tokens before their first output
+    byte and can exceed the timeout on a prompt this small, but sending it to a
+    host that does not know the field fails the request outright.
+
     Like :class:`OllamaClient`, every failure returns ``""`` so the caller's
-    schema validation refuses cleanly and falls back.
+    schema validation refuses cleanly and falls back. The reason is kept in
+    :attr:`last_error` rather than discarded, because silent degradation is
+    correct for a visitor and useless for whoever is holding the key.
     """
 
     model: str
@@ -131,19 +175,38 @@ class OpenAICompatClient:
     base_url: str
     temperature: float = 0.2
     timeout: float = 10.0
+    reasoning_effort: str = ""
+    last_error: str = field(default="", init=False)
 
     def available(self) -> bool:
         """True when a key is configured. Deliberately makes no network call."""
         return bool(self.api_key)
 
+    # Below this, a "key" is a fragment that occurs in ordinary words, and
+    # replacing it corrupts the message it is meant to be protecting.
+    _MIN_REDACTABLE = 8
+
+    def _redact(self, message: str) -> str:
+        """Never let the key travel with the reason it failed."""
+        if len(self.api_key) < self._MIN_REDACTABLE:
+            return message
+        return message.replace(self.api_key, "***")
+
     def __call__(self, prompt: str) -> str:
+        self.last_error = ""
         if not self.api_key:
+            self.last_error = "no API key is set"
             return ""
-        payload = {
+        payload: dict = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": self.temperature,
         }
+        # Only sent when asked for, because providers disagree about it: Gemini's
+        # reasoning models need it to answer promptly, while a host that does not
+        # recognise the field rejects the whole request.
+        if self.reasoning_effort:
+            payload["reasoning_effort"] = self.reasoning_effort
         req = urllib.request.Request(
             f"{self.base_url.rstrip('/')}/chat/completions",
             data=json.dumps(payload).encode("utf-8"),
@@ -156,8 +219,16 @@ class OpenAICompatClient:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 body = json.loads(resp.read().decode("utf-8"))
             return str(body["choices"][0]["message"]["content"])
-        except (urllib.error.URLError, OSError, ValueError, KeyError, IndexError):
-            return ""
+        except urllib.error.HTTPError as exc:
+            self.last_error = self._redact(
+                f"provider refused model '{self.model}' with HTTP {exc.code}: "
+                f"{_http_error_detail(exc)}"
+            )
+        except (urllib.error.URLError, OSError) as exc:
+            self.last_error = self._redact(f"could not reach {self.base_url}: {exc}")
+        except (ValueError, KeyError, IndexError) as exc:
+            self.last_error = f"could not read the provider's reply: {exc!r}"
+        return ""
 
 
 @dataclass
@@ -184,6 +255,22 @@ class GuardedClient:
     @property
     def tripped(self) -> bool:
         return self._failures >= self.max_failures
+
+    @property
+    def last_error(self) -> str:
+        """Why the wrapped client last came back empty, if it said.
+
+        Delegated so callers can hold the guard without having to know what it
+        wraps. Once tripped the inner client is no longer called, so the stored
+        reason is the one that caused the breaker to open.
+        """
+        reason = str(getattr(self.inner, "last_error", ""))
+        if self.tripped:
+            return (
+                f"not calling the provider after {self._failures} consecutive "
+                f"failures; last reason: {reason or 'unknown'}"
+            )
+        return reason
 
 
 def make_llm_client(
@@ -234,6 +321,8 @@ def client_from_env() -> LLMClient | None:
         timeout = 10.0
     if isinstance(client, OpenAICompatClient | OllamaClient):
         client.timeout = timeout
+    if isinstance(client, OpenAICompatClient):
+        client.reasoning_effort = os.environ.get("HYDRALOOP_LLM_REASONING_EFFORT", "").strip()
 
     return GuardedClient(inner=client)
 

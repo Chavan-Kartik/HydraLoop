@@ -64,7 +64,14 @@ HYDRALOOP_LLM_BASE_URL=https://api.groq.com/openai/v1
 HYDRALOOP_LLM_MODEL=llama-3.3-70b-versatile
 HYDRALOOP_LLM_API_KEY=...
 HYDRALOOP_LLM_TIMEOUT=10          # seconds, optional
+HYDRALOOP_LLM_REASONING_EFFORT=   # minimal | low | medium | high, optional
 ```
+
+Set `HYDRALOOP_LLM_REASONING_EFFORT` when pointing at a reasoning model. Those
+models spend hidden tokens before their first output byte and will otherwise
+exceed the timeout on a prompt this small, which reads as the model being
+unavailable. It stays unset by default because a host that does not recognise the
+field rejects the request outright.
 
 `openai` speaks to any OpenAI-compatible `/chat/completions` host; `ollama`
 targets a local server. `/api/health` reports whether a model is configured, and

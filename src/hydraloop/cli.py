@@ -147,7 +147,10 @@ def evolve(
 @app.command()
 def discover(
     text: str = typer.Argument(..., help="Abstract description of an emerging fraud trend."),
-    llm: str = typer.Option("none", help="GenAI mapper provider: none | ollama."),
+    llm: str = typer.Option(
+        "none",
+        help="GenAI mapper provider: none | ollama | env (read HYDRALOOP_LLM_* vars).",
+    ),
     llm_model: str = typer.Option("llama3.2", help="Local model name."),
     run_id: str = typer.Option(None),
 ) -> None:
@@ -155,18 +158,21 @@ def discover(
 
     Turns a paragraph of abstract fraud intel into a schema-valid attack genome the
     twin can run - discovery, not a hand-written catalog entry. Uses a local model
-    when ``--llm ollama`` is set, otherwise a deterministic keyword mapper.
+    with ``--llm ollama``, a hosted one with ``--llm env``, and otherwise a
+    deterministic keyword mapper. Check ``method`` in the output to see which ran.
     """
     import json as _json
 
     import numpy as _np
 
     from .red.discover import discover_threat
-    from .red.llm import make_llm_client
+    from .red.llm import client_from_env, make_llm_client
 
     ensure_dirs()
     rid = run_id or _new_run_id()
-    client = make_llm_client(llm, llm_model)
+    # `env` reuses exactly what the API request path builds, so a key verified
+    # here is a key that will work once deployed.
+    client = client_from_env() if llm.strip().lower() == "env" else make_llm_client(llm, llm_model)
     result = discover_threat(text, _np.random.default_rng(0), llm=client)
     out = run_dir(rid) / "discovered_threat.json"
     out.write_text(_json.dumps(result, indent=2), encoding="utf-8")
@@ -174,6 +180,66 @@ def discover(
                f"(method={result['method']}), genome {result['genome_id']}")
     typer.echo(f"  {result['brief']}")
     typer.echo(f"Written to {out}")
+    # Falling back silently is the right behaviour in the request path, but here
+    # someone is holding the key and needs to know a configured model went unused.
+    if result["method"] == "fallback" and client is not None:
+        reason = getattr(client, "last_error", "") or "the reply was not valid JSON for the genome schema"
+        typer.secho(f"Model configured but not used: {reason}", fg="yellow", err=True)
+
+
+@app.command()
+def llm_check() -> None:
+    """Report the effective model configuration and time one live call.
+
+    Builds the client exactly the way the API request path does, so a setup that
+    passes here is one that works deployed. Use it before touching a host's
+    dashboard, and again afterwards against the same variables.
+
+    Prints what each variable resolved to, never the key itself. Exits non-zero
+    when the model does not answer, so it can gate a deploy.
+    """
+    import time
+
+    from .red.llm import client_from_env
+
+    client = client_from_env()
+    if client is None:
+        typer.echo("No model configured; Identify will use the deterministic keyword mapper.")
+        typer.echo("Set HYDRALOOP_LLM_PROVIDER and HYDRALOOP_LLM_API_KEY to change that.")
+        return
+
+    inner = getattr(client, "inner", client)
+    key = str(getattr(inner, "api_key", ""))
+    timeout = float(getattr(inner, "timeout", 0.0))
+    effort = str(getattr(inner, "reasoning_effort", "")) or "(unset)"
+    rows = [
+        ("base_url", str(getattr(inner, "base_url", ""))),
+        ("model", str(getattr(inner, "model", ""))),
+        ("timeout", f"{timeout:g}s"),
+        ("reasoning_effort", effort),
+        ("api_key", f"set, {len(key)} characters" if key else "MISSING"),
+    ]
+    for label, value in rows:
+        typer.echo(f"  {label:<17} {value}")
+
+    started = time.perf_counter()
+    reply = client('Reply with only this JSON and nothing else: {"ok": true}')
+    elapsed = time.perf_counter() - started
+
+    if reply:
+        typer.secho(f"\nAnswered in {elapsed:.1f}s: {reply.strip()[:120]}", fg="green")
+        return
+
+    reason = getattr(client, "last_error", "") or "the model returned nothing"
+    typer.secho(f"\nNo answer after {elapsed:.1f}s: {reason}", fg="red", err=True)
+    if elapsed >= timeout - 0.5:
+        typer.secho(
+            "That is the timeout, not a refusal. A reasoning model with no "
+            "HYDRALOOP_LLM_REASONING_EFFORT set is the usual cause.",
+            fg="yellow",
+            err=True,
+        )
+    raise typer.Exit(code=1)
 
 
 @app.command()

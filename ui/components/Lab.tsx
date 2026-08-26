@@ -430,6 +430,11 @@ function CaseView({ c }: { c: LabCase }) {
       </div>
       <div>
         <SectionLabel>SHAP reason codes</SectionLabel>
+        {c.reason_codes.length === 0 && (
+          <p className="mt-2 text-[12px] text-ink-ghost">
+            The explainer could not run on this row, so there is nothing to show here.
+          </p>
+        )}
         <div className="mt-2 space-y-1">
           {c.reason_codes.map((r) => (
             <div key={r.feature} className="flex items-center gap-2 text-[12px]">

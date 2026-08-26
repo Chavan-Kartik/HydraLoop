@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 from ..blue.detector import Detector
-from ..blue.features import MODEL_FEATURES, feature_matrix, mature_mask
+from ..blue.features import feature_matrix, mature_mask
 from ..config import Config, SimulationConfig
 from ..red.discover import discover_threat
 from ..red.dsl.genome import Genome
@@ -96,21 +96,17 @@ def _cases(detector: Detector, df: pd.DataFrame, scores: np.ndarray, k: int = 5)
     cases = []
     for i in order:
         i = int(i)
+        # An explanation we could not compute is reported as absent, never
+        # approximated. Zeroed contributions and an arithmetic stand-in for the
+        # counterfactual are indistinguishable from real SHAP output once
+        # rendered, so a failure here would read as analysis rather than as a
+        # gap. SHAP raises a variety of types on degenerate trees, hence a broad
+        # catch; the point is that it degrades honestly.
         try:
             reasons = top_reason_codes(detector.model, X[i], k=5)
             cf = counterfactual(detector.model, detector.calibrator, X[i], "payee_is_new", 0.0)
-        except Exception:
-            reasons = [
-                {"feature": f, "contribution": 0.0}
-                for f in MODEL_FEATURES[:5]
-            ]
-            cf = {
-                "feature": "payee_is_new",
-                "from_value": 1.0,
-                "to_value": 0.0,
-                "risk_before": float(scores[i]),
-                "risk_after": float(max(0.0, scores[i] - 0.2)),
-            }
+        except Exception:  # noqa: BLE001 - report as unexplained, do not invent numbers
+            reasons, cf = [], None
         cases.append(
             {
                 "txn_id": str(df.iloc[i]["txn_id"]),
@@ -211,7 +207,13 @@ def iter_lab(text: str) -> Iterator[dict[str, Any]]:
         "id": "generate",
         "title": "2 · Generate (constrained genome)",
         "ok": True,
-        "detail": disc["brief"],
+        # Not the brief: it is already shown in full in the genome panel, and a
+        # paragraph repeated inside the pipeline rail crowds out the four other
+        # steps. This says what the step did to earn its tick.
+        "detail": (
+            f"Clamped onto the DSL's hard bounds and validated. "
+            f"Genome {disc['genome_id']}, {len(highlights)} bounded parameters set."
+        ),
     }
     steps.append(generate)
     yield {"type": "step", "step": generate}
@@ -300,8 +302,8 @@ def iter_lab(text: str) -> Iterator[dict[str, Any]]:
         "title": "4 · Detect & decide",
         "ok": True,
         "detail": (
-            f"Caught {caught}/{n_fraud} attack txns at p≥0.45. "
-            f"{escaped} escaped. False positives on legit: {fp}."
+            f"Caught {caught} of {n_fraud} attack transactions at p≥0.45, {escaped} escaped. "
+            f"False positives on legitimate traffic: {fp}."
         ),
     }
     steps.append(detect)

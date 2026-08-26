@@ -108,13 +108,15 @@ export type InvestigationCase = {
   risk_score: number;
   is_fraud: boolean;
   reason_codes: ReasonCode[];
+  // Null when the explainer could not run for this row. The alternative, filling
+  // in plausible numbers, would be indistinguishable from a real explanation.
   counterfactual: {
     feature: string;
     from_value: number;
     to_value: number;
     risk_before: number;
     risk_after: number;
-  };
+  } | null;
 };
 
 export type Investigations = { run_id: string; cases: InvestigationCase[] };
