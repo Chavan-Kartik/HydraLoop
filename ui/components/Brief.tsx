@@ -86,6 +86,8 @@ export function StrategistBeat() {
   const accepted = data?.accepted ?? 0;
   const refused = data?.refused ?? 0;
   const llmAuthored = data?.llm_authored ?? 0;
+  const modelReady = Boolean(data?.available);
+  const modelName = data?.model ?? null;
 
   return (
     <Card className="p-5">
@@ -93,25 +95,31 @@ export function StrategistBeat() {
         <div>
           <SectionLabel>Red-team strategist (GenAI, constrained)</SectionLabel>
           <div className="mt-1 text-base font-bold text-ink">
-            No cloud API key. The attack never leaves the genome schema.
+            The attack never leaves the genome schema.
           </div>
         </div>
         <Badge tone="green">
-          <KeyRound className="h-3 w-3" /> no API key required
+          <KeyRound className="h-3 w-3" />
+          {modelReady ? (modelName ?? "model configured") : "runs without an API key"}
         </Badge>
       </div>
 
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-faint">
-        Default is a deterministic planner so the demo runs offline. Optionally a local Ollama
-        model can propose the next genome; every proposal is schema-validated and clamped, and a
-        refusal is logged instead of executed. Grok, OpenAI, and other cloud keys are not used.
+        Unconfigured, a deterministic planner proposes the next genome, so the demo runs
+        offline. With a model configured, the strategist asks it for bounded numeric
+        parameters only. Every proposal is schema-validated and clamped to the DSL&apos;s
+        hard bounds, and anything still invalid is logged as a refusal instead of executed.
       </p>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Proposals" value={proposals} />
         <Stat label="Accepted" value={accepted} />
         <Stat label="Refused" value={refused} />
-        <Stat label="LLM-authored" value={llmAuthored} hint={llmAuthored === 0 ? "planner" : "ollama"} />
+        <Stat
+          label="LLM-authored"
+          value={llmAuthored}
+          hint={llmAuthored === 0 ? "planner" : (modelName ?? data?.provider ?? "model")}
+        />
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2 text-[11px] text-ink-faint">

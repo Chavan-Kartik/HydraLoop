@@ -104,8 +104,8 @@ export function Sidebar() {
           Loop online
         </div>
         <p className="mt-1 text-[10px] leading-relaxed text-ink-ghost">
-          Synthetic, sandboxed, no PII, no cloud API key. Every decision on a
-          tamper-evident trail.
+          Synthetic, sandboxed, no PII. Every decision on a tamper-evident
+          trail.
         </p>
       </div>
     </aside>
