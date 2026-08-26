@@ -96,3 +96,31 @@ def test_strategist_never_requires_an_api_key(client, seeded_run):
     verbs = [s["verb"] for s in data["pipeline"]]
     assert verbs == ["Identify", "Generate", "Defend"]
     assert "genome" in data["guardrail"]
+
+
+def test_the_arena_run_uses_the_same_model_as_the_lab(monkeypatch, tmp_path):
+    """One configuration has to govern every place a model can run.
+
+    The Arena route previously ignored the model entirely, so a configured
+    deployment still ran a fully deterministic loop.
+    """
+    from hydraloop.loop import orchestrator
+
+    seen: dict = {}
+
+    def fake_run_loop(cfg, run_id, generations=5, rollback_demo_generation=2, llm=None):
+        seen["llm"] = llm
+        summary = tmp_path / "loop_summary.json"
+        summary.write_text("{}", encoding="utf-8")
+        return summary
+
+    def configured(_prompt: str) -> str:
+        return ""
+
+    monkeypatch.setattr(orchestrator, "run_loop", fake_run_loop)
+    monkeypatch.setattr(app_module, "request_path_client", lambda: configured)
+
+    app_module._execute_run("arena_test", 2)
+
+    assert app_module._JOBS["arena_test"]["status"] == "done"
+    assert seen["llm"] is configured, "the Arena ran without the configured model"

@@ -184,3 +184,50 @@ class Strategist:
 
     def refusals(self) -> list[AuditEntry]:
         return [e for e in self.audit_log if not e.accepted]
+
+
+def audit_report(
+    strategist: Strategist, proposals: list[Genome], client: LLMClient | None
+) -> dict[str, Any]:
+    """Project the audit log into the record the Strategist screen reads.
+
+    Shared by both drivers that run a strategist so the screen means the same
+    thing whichever produced the run. ``llm_authored`` counts only proposals a
+    model actually authored, which is why it is derived from the audit reasons
+    rather than from whether a client was configured.
+    """
+    from .dsl.render import render_brief
+    from .llm import describe_client
+
+    entries = [
+        {"accepted": e.accepted, "reason": e.reason, "genome_id": e.genome_id, "family": e.family}
+        for e in strategist.audit_log
+    ]
+    # Join on genome_id, never on position: the audit log accumulates across all
+    # generations and also records refusals, which carry no genome, so zipping it
+    # against one generation's proposals would attach the wrong reason to a genome.
+    by_id = {g.genome_id: g for g in proposals}
+    samples = []
+    for entry in strategist.audit_log:
+        if not (entry.accepted and "llm" in entry.reason):
+            continue
+        genome = by_id.get(entry.genome_id)
+        if genome is None:
+            continue
+        samples.append(
+            {
+                "genome_id": genome.genome_id,
+                "family": genome.family,
+                "reason": entry.reason,
+                "brief": render_brief(genome),
+            }
+        )
+    return {
+        **describe_client(client),
+        "proposals": len(strategist.audit_log),
+        "accepted": len(strategist.accepted()),
+        "refused": len(strategist.refusals()),
+        "llm_authored": len(samples),
+        "samples": samples[:6],
+        "entries": entries,
+    }

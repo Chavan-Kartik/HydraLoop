@@ -50,7 +50,6 @@ class RedTeamConfig:
     mutation_rate: float = 0.2
     crossover_rate: float = 0.1
     elite_archive_size: int = 100
-    use_llm_strategist: bool = False
     use_quality_diversity: bool = False
 
 

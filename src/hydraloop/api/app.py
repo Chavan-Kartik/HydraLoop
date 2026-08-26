@@ -90,12 +90,16 @@ def health() -> dict:
     return {
         "status": "ok",
         "runs": len(runs),
-        # Whether Identify will use a model or the keyword mapper on this
-        # deployment. Reports configuration, not reachability: a wrong key still
-        # reads as configured until the first call fails and the guard trips.
+        # Whether Identify and the strategist will use a model or their
+        # deterministic counterparts on this deployment. Reports configuration,
+        # not reachability: a wrong key still reads as configured until the first
+        # call fails and the guard trips. The model name is included because a
+        # retired one is the most common reason a configured deployment falls
+        # back, and this makes it checkable without a shell.
         "llm": {
             "configured": client is not None,
             "degraded": bool(getattr(client, "tripped", False)),
+            "model": getattr(getattr(client, "inner", client), "model", None),
         },
     }
 
@@ -262,7 +266,9 @@ def _execute_run(run_id: str, generations: int) -> None:
     _JOBS[run_id] = {"status": "running", "error": None}
     try:
         cfg = load_config(CONFIGS_DIR / "live.yaml")
-        run_loop(cfg, run_id, generations=generations)
+        # The same client the Lab uses, so one configuration governs every place a
+        # model can run. Unconfigured this is None and the loop stays deterministic.
+        run_loop(cfg, run_id, generations=generations, llm=request_path_client())
         _JOBS[run_id] = {"status": "done", "error": None}
     except Exception as exc:  # noqa: BLE001 — surface to the UI, do not crash the API
         _JOBS[run_id] = {"status": "error", "error": str(exc)}

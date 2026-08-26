@@ -37,11 +37,16 @@ not a retrain script.
 
 ## The generative red team
 
-Two places can be driven by a language model: the strategist that proposes the
-next genome inside the co-evolution loop, and the Identify step that turns a
-plain-English threat description into a simulatable attack.
+One environment configuration turns on a model in three places, all reachable
+from the running app:
 
-Neither ever asks a model for attack content. The prompt requests bounded
+| Where | What the model does | Screen |
+|---|---|---|
+| Identify | turns a plain-English threat description into an attack family and gene overlay | Lab |
+| Identify, again | the same step ahead of the escape-and-harden cycle | Harden |
+| Strategist | proposes the next genome each generation of the co-evolution loop | Arena, Strategist |
+
+Nothing ever asks a model for attack content. The prompt requests bounded
 numeric parameters and behavioural signal names as JSON, and the reply passes
 three tiers before it can reach the twin:
 
@@ -74,10 +79,19 @@ unavailable. It stays unset by default because a host that does not recognise th
 field rejects the request outright.
 
 `openai` speaks to any OpenAI-compatible `/chat/completions` host; `ollama`
-targets a local server. `/api/health` reports whether a model is configured, and
-the Lab's Identify step names which mapper produced each result, so it is always
-visible which path ran. A provider that stops answering trips a breaker after
-three consecutive failures and the run falls back rather than stalling.
+targets a local server.
+
+Which path ran is always visible rather than asserted. `/api/health` reports
+whether a model is configured and which model name it resolved to. The Lab's
+Identify step names the mapper that produced each result. Every generation of a
+co-evolution run records its strategist proposals, accepts and refusals in the
+hash-chained ledger, and the Strategist screen shows the proposals a model
+actually authored, counted from the audit reasons rather than from whether a key
+was present. A provider that stops answering trips a breaker after three
+consecutive failures and the run falls back rather than stalling.
+
+`python -m hydraloop llm-check` prints the resolved configuration and times one
+live call, which is the quickest way to tell a misconfiguration from an outage.
 
 ## Safety and scope
 

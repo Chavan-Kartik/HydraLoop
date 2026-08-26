@@ -37,7 +37,6 @@ red_team:
   mutation_rate: 0.2
   crossover_rate: 0.1
   elite_archive_size: 100
-  use_llm_strategist: false
   use_quality_diversity: false
 
 evaluation:

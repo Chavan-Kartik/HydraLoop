@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import urllib.error
 import urllib.request
 from collections.abc import Callable
@@ -239,17 +240,24 @@ class GuardedClient:
     full timeout before falling back, which is worse for a visitor than not
     configuring a model at all. After ``max_failures`` consecutive empty
     responses this returns ``""`` immediately; one success resets the count.
+
+    The failure count is mutated under a lock because one cached instance is
+    shared by the request handlers and by co-evolution runs on the background
+    pool, so concurrent callers would otherwise race on it.
     """
 
     inner: LLMClient
     max_failures: int = 3
     _failures: int = field(default=0, init=False)
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
 
     def __call__(self, prompt: str) -> str:
-        if self._failures >= self.max_failures:
-            return ""
+        with self._lock:
+            if self._failures >= self.max_failures:
+                return ""
         out = self.inner(prompt)
-        self._failures = 0 if out else self._failures + 1
+        with self._lock:
+            self._failures = 0 if out else self._failures + 1
         return out
 
     @property
@@ -327,6 +335,28 @@ def client_from_env() -> LLMClient | None:
     return GuardedClient(inner=client)
 
 
+def describe_client(client: LLMClient | None) -> dict[str, object]:
+    """What is actually wired up, for audit records and the health endpoint.
+
+    Derived from the object rather than from the configuration that was asked
+    for, because the two can disagree: a hosted provider named without a key
+    builds no client at all, and reporting the requested name in that case would
+    claim a model was driving a run that the deterministic planner drove.
+    """
+    if client is None:
+        return {"provider": "none", "model": None, "available": False}
+    inner = getattr(client, "inner", client)
+    if isinstance(inner, OllamaClient):
+        return {"provider": "ollama", "model": inner.model, "available": inner.available()}
+    if isinstance(inner, OpenAICompatClient):
+        return {
+            "provider": "openai-compatible",
+            "model": inner.model,
+            "available": inner.available(),
+        }
+    return {"provider": "custom", "model": getattr(inner, "model", None), "available": True}
+
+
 @lru_cache(maxsize=1)
 def request_path_client() -> LLMClient | None:
     """The single client shared by API request handlers.
@@ -345,6 +375,7 @@ __all__ = [
     "OllamaClient",
     "OpenAICompatClient",
     "client_from_env",
+    "describe_client",
     "extract_json",
     "make_llm_client",
     "request_path_client",

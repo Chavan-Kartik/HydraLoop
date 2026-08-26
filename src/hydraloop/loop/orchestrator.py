@@ -22,7 +22,9 @@ from ..config import Config
 from ..paths import run_dir
 from ..red.dsl.genome import Genome, genome_from_template
 from ..red.dsl.mutate import mutate
+from ..red.llm import LLMClient
 from ..red.mixer import build_attack_specs
+from ..red.strategist import Strategist, audit_report
 from ..twin.decision import AlwaysApprove
 from ..twin.population import SECONDS_PER_DAY
 from ..twin.run import build_engine, legit_session_specs
@@ -59,6 +61,41 @@ def _evolve(parents: list[Genome], escaped_ids: set[str], registry, rate: float)
     return children
 
 
+# One call per escaping genome would make a run's latency scale with the catalog,
+# and the population already doubles every generation. A small fixed number is
+# enough for the model to steer the search without dominating the runtime.
+STRATEGIST_PROPOSALS_PER_GENERATION = 2
+
+
+def _strategist_children(
+    strategist: Strategist, parents: list[Genome], escaped_ids: set[str], context: dict
+) -> list[Genome]:
+    """Model-proposed children for the genomes that got through last generation.
+
+    Escapees are targeted first, since those are the attacks worth strengthening.
+    Each proposal passes the strategist's three tiers, so an invalid one costs a
+    deterministic mutation rather than the run.
+    """
+    targets = [g for g in parents if g.genome_id in escaped_ids] or parents
+    return [
+        strategist.propose(p, context)
+        for p in targets[:STRATEGIST_PROPOSALS_PER_GENERATION]
+    ]
+
+
+def _generation_audit(strategist: Strategist | None, mark: int) -> dict:
+    """Strategist counts for this generation only, for the ledger entry."""
+    if strategist is None:
+        return {"enabled": False, "proposals": 0, "accepted": 0, "refused": 0}
+    fresh = strategist.audit_log[mark:]
+    return {
+        "enabled": True,
+        "proposals": len(fresh),
+        "accepted": sum(1 for e in fresh if e.accepted),
+        "refused": sum(1 for e in fresh if not e.accepted),
+    }
+
+
 def _run_generation_sim(cfg_g: Config, genomes: list[Genome], decision_engine, defender_cfg):
     engine, registry = build_engine(cfg_g)
     horizon_s = cfg_g.simulation.horizon_days * SECONDS_PER_DAY
@@ -91,7 +128,20 @@ def _split_train_val(df: pd.DataFrame, seed: int) -> tuple[pd.DataFrame, pd.Data
     return df.iloc[:cut].copy(), df.iloc[cut:].copy()
 
 
-def run_loop(cfg: Config, run_id: str, generations: int = 5, rollback_demo_generation: int = 2) -> Path:
+def run_loop(
+    cfg: Config,
+    run_id: str,
+    generations: int = 5,
+    rollback_demo_generation: int = 2,
+    llm: LLMClient | None = None,
+) -> Path:
+    """Run the co-evolution loop, optionally with a model proposing genomes.
+
+    With ``llm`` unset the red team's variation is exactly the deterministic
+    mutation it has always been, so an offline run is unchanged. With a client,
+    a schema-constrained strategist also proposes genomes each generation and
+    its accepts and refusals are recorded per generation in the ledger.
+    """
     out = run_dir(run_id)
     out.mkdir(parents=True, exist_ok=True)
     ledger_path = out / "generation_ledger.jsonl"
@@ -102,6 +152,14 @@ def run_loop(cfg: Config, run_id: str, generations: int = 5, rollback_demo_gener
     registry = ModelRegistry(out / "detector.pkl")
 
     genomes = _base_genomes(cfg)
+    # Built only when a model is configured, so the offline path keeps its exact
+    # previous behaviour rather than gaining a second source of variation.
+    strategist = (
+        Strategist(rng=np.random.default_rng(cfg.simulation.seed), llm=llm)
+        if llm is not None
+        else None
+    )
+    proposals: list[Genome] = []
     escaped_ids: set[str] = set()
     prev_escape_rate: float | None = None
     escapes_closed_total = 0
@@ -114,9 +172,23 @@ def run_loop(cfg: Config, run_id: str, generations: int = 5, rollback_demo_gener
 
     for g in range(1, generations + 1):
         cfg_g = _seed_generation(cfg, g)
+        audit_mark = len(strategist.audit_log) if strategist is not None else 0
 
         if g > 1:
             genomes = _evolve(genomes, escaped_ids, registry_rng, cfg.red_team.mutation_rate)
+            if strategist is not None:
+                children = _strategist_children(
+                    strategist,
+                    genomes,
+                    escaped_ids,
+                    {
+                        "generation": g,
+                        "previous_escape_rate": prev_escape_rate,
+                        "escaping_genomes": len(escaped_ids),
+                    },
+                )
+                proposals.extend(children)
+                genomes = genomes + children
 
         # 1. Simulate against the live policy (AlwaysApprove before a model exists).
         if registry.incumbent is None:
@@ -201,10 +273,20 @@ def run_loop(cfg: Config, run_id: str, generations: int = 5, rollback_demo_gener
             "incumbent_archive_recall": round(res.incumbent_recall, 4),
             "gate_events": gate_events,
             "promoted": promoted,
+            "strategist": _generation_audit(strategist, audit_mark),
         }
         ledger.append(payload)
         prev_escape_rate = escape_rate
 
+    # Written only for a model-driven run, so the Strategist screen shows this
+    # run's own proposals instead of falling back to the committed example.
+    report = audit_report(strategist, proposals, llm) if strategist is not None else None
+    if report is not None:
+        (out / "strategist_audit.json").write_text(
+            json.dumps(report, indent=2), encoding="utf-8"
+        )
+
+    headline = ("provider", "model", "available", "proposals", "accepted", "refused", "llm_authored")
     summary = {
         "run_id": run_id,
         "generations": generations,
@@ -212,6 +294,19 @@ def run_loop(cfg: Config, run_id: str, generations: int = 5, rollback_demo_gener
         "rollbacks": rollbacks,
         "ledger_entries": len(ledger.entries),
         "ledger_head": ledger.head_hash,
+        "strategist": (
+            {k: report[k] for k in headline}
+            if report is not None
+            else {
+                "provider": "none",
+                "model": None,
+                "available": False,
+                "proposals": 0,
+                "accepted": 0,
+                "refused": 0,
+                "llm_authored": 0,
+            }
+        ),
     }
     (out / "loop_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     # Verify the on-disk ledger reconstructs and validates.

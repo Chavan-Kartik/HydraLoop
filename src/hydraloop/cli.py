@@ -22,6 +22,19 @@ def _new_run_id() -> str:
     return _dt.datetime.now().strftime("run_%Y%m%d_%H%M%S")
 
 
+def _client_for(provider: str, model: str, base_url: str = "http://localhost:11434"):
+    """Build an LLM client from a ``--llm`` option value.
+
+    ``env`` reuses exactly what the API request path builds, so a configuration
+    verified from the command line is the one that runs deployed.
+    """
+    from .red.llm import client_from_env, make_llm_client
+
+    if provider.strip().lower() == "env":
+        return client_from_env()
+    return make_llm_client(provider, model, base_url=base_url)
+
+
 @app.command()
 def manifest(config: str = typer.Option(None, help="Path to a config YAML.")) -> None:
     """Emit a reproducibility manifest for the current configuration."""
@@ -122,24 +135,27 @@ def evaluate(
 def evolve(
     config: str = typer.Option(None),
     generations: int = typer.Option(15, help="Co-evolution generations (Gate G4 needs 15+)."),
-    llm: str = typer.Option("none", help="GenAI strategist provider: none | ollama."),
+    llm: str = typer.Option(
+        "none",
+        help="GenAI strategist provider: none | ollama | env (read HYDRALOOP_LLM_* vars).",
+    ),
     llm_model: str = typer.Option("llama3.2", help="Local model name for the strategist."),
     llm_base_url: str = typer.Option("http://localhost:11434", help="Ollama base URL."),
     run_id: str = typer.Option(None),
 ) -> None:
     """Run red-team economics + quality-diversity search vs the live policy (Phase 9).
 
-    Pass ``--llm ollama`` to drive the red team with a local language model
-    (schema-validated, offline). Without it, a deterministic planner is used, so
-    the run never depends on a model being present.
+    Pass ``--llm ollama`` for a local model or ``--llm env`` for a hosted one to
+    drive the strategist, whose proposals are schema-validated either way.
+    Without it a deterministic planner is used, so the run never depends on a
+    model being present.
     """
     from .red.coevolution import run_coevolution_economics
 
     cfg = load_config(config)
     rid = run_id or _new_run_id()
     out = run_coevolution_economics(
-        cfg, rid, generations=generations,
-        llm_provider=llm, llm_model=llm_model, llm_base_url=llm_base_url,
+        cfg, rid, generations=generations, llm=_client_for(llm, llm_model, llm_base_url)
     )
     typer.echo(f"Co-evolution economics written to {out}")
 
@@ -166,13 +182,10 @@ def discover(
     import numpy as _np
 
     from .red.discover import discover_threat
-    from .red.llm import client_from_env, make_llm_client
 
     ensure_dirs()
     rid = run_id or _new_run_id()
-    # `env` reuses exactly what the API request path builds, so a key verified
-    # here is a key that will work once deployed.
-    client = client_from_env() if llm.strip().lower() == "env" else make_llm_client(llm, llm_model)
+    client = _client_for(llm, llm_model)
     result = discover_threat(text, _np.random.default_rng(0), llm=client)
     out = run_dir(rid) / "discovered_threat.json"
     out.write_text(_json.dumps(result, indent=2), encoding="utf-8")

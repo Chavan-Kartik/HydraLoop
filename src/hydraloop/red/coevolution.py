@@ -22,11 +22,10 @@ from ..paths import run_dir
 from ..twin.run import build_engine, legit_session_specs
 from .bandit import optimise_strategy
 from .dsl.genome import Genome, genome_from_template
-from .dsl.render import render_brief
 from .economics import FitnessWeights, evaluate_genome, fitness
-from .llm import OllamaClient, make_llm_client
+from .llm import LLMClient
 from .mapelites import MapElitesArchive, run_map_elites
-from .strategist import Strategist
+from .strategist import Strategist, audit_report
 
 
 def _base_seeds() -> list[Genome]:
@@ -86,45 +85,6 @@ def _run_generation(cfg, policy, seeds, strategist, rng, weights,
     return archive, elites, collected, proposals
 
 
-def _strategist_report(strategist: Strategist, proposals: list[Genome], provider: str,
-                       model: str, available: bool) -> dict:
-    """Project the strategist audit into a UI-friendly, judge-legible record."""
-    entries = [
-        {"accepted": e.accepted, "reason": e.reason, "genome_id": e.genome_id, "family": e.family}
-        for e in strategist.audit_log
-    ]
-    # Join on genome_id, never on position: the audit log accumulates across all
-    # generations and also records refusals, which carry no genome, so zipping it
-    # against one generation's proposals would attach the wrong reason to a genome.
-    by_id = {g.genome_id: g for g in proposals}
-    samples = []
-    for entry in strategist.audit_log:
-        if not (entry.accepted and "llm" in entry.reason):
-            continue
-        genome = by_id.get(entry.genome_id)
-        if genome is None:
-            continue
-        samples.append(
-            {
-                "genome_id": genome.genome_id,
-                "family": genome.family,
-                "reason": entry.reason,
-                "brief": render_brief(genome),
-            }
-        )
-    return {
-        "provider": provider,
-        "model": model if provider != "none" else None,
-        "available": available,
-        "proposals": len(strategist.audit_log),
-        "accepted": len(strategist.accepted()),
-        "refused": len(strategist.refusals()),
-        "llm_authored": len(samples),
-        "samples": samples[:6],
-        "entries": entries,
-    }
-
-
 def run_coevolution_economics(
     cfg: Config,
     run_id: str,
@@ -132,19 +92,20 @@ def run_coevolution_economics(
     qd_iterations: int = 24,
     n_episodes: int = 30,
     bandit_rounds: int = 40,
-    llm_provider: str = "none",
-    llm_model: str = "llama3.2",
-    llm_base_url: str = "http://localhost:11434",
+    llm: LLMClient | None = None,
 ) -> Path:
+    """Run the quality-diversity search, optionally with a model in the strategist.
+
+    Takes an already-built client rather than provider strings so there is one
+    way to construct one. The previous string form silently dropped the API key,
+    which meant every hosted provider resolved to no client while the audit file
+    still named it.
+    """
     out = run_dir(run_id)
     rng = np.random.default_rng(cfg.simulation.seed)
     weights = FitnessWeights()
 
-    llm_client = make_llm_client(llm_provider, llm_model, llm_base_url)
-    llm_available = bool(llm_client) and (
-        llm_client.available() if isinstance(llm_client, OllamaClient) else True
-    )
-    strategist = Strategist(rng=rng, llm=llm_client)
+    strategist = Strategist(rng=rng, llm=llm)
     all_proposals: list[Genome] = []
 
     legit_df = _initial_legit(cfg)
@@ -182,9 +143,7 @@ def run_coevolution_economics(
             fraud_accum.append(pd.concat(collected, ignore_index=True))
         seeds = [e.genome for e in elites] or seeds
 
-    strategist_report = _strategist_report(
-        strategist, all_proposals, llm_provider, llm_model, llm_available
-    )
+    strategist_report = audit_report(strategist, all_proposals, llm)
     (out / "strategist_audit.json").write_text(
         json.dumps(strategist_report, indent=2), encoding="utf-8"
     )
