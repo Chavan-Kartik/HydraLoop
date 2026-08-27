@@ -26,6 +26,36 @@ def test_loop_runs_unattended_and_seals_the_ledger(small_config):
     assert summary["rollbacks"] >= 1
 
 
+def test_every_escaping_genome_can_be_named_on_the_lineage_screen(small_config):
+    """Lineage showed "no brief recorded" for every node on a real run.
+
+    Only the curated example shipped a genome manifest, and mutation mints a new
+    id each generation, so nothing the loop actually simulated could be resolved
+    to a family or a brief.
+    """
+    from hydraloop.api.ledger_source import genome_lineage
+
+    summary_path = run_loop(small_config, run_id="test_loop_lineage", generations=2)
+    manifest = json.loads(
+        (summary_path.parent / "genomes.json").read_text(encoding="utf-8")
+    )
+    assert manifest, "no genome manifest written for the run"
+
+    lineage = genome_lineage("test_loop_lineage")
+    assert lineage["nodes"], "no escaping genomes to describe"
+
+    by_id = {g["genome_id"]: g for g in manifest}
+    for node in lineage["nodes"]:
+        assert node["brief"], f"no brief for genome {node['genome_id']}"
+        assert node["family"], f"no family for genome {node['genome_id']}"
+        # The attack id, family and brief must all describe the same genome. The
+        # cluster used to take its genome and its attack id as two independent
+        # modes, which labelled nodes with an unrelated attack's family.
+        entry = by_id[node["genome_id"]]
+        assert entry["attack_id"] == node["attack_id"]
+        assert entry["family"] == node["family"]
+
+
 def test_loop_without_a_model_records_no_strategist_activity(small_config):
     """The offline default must not claim a model ran."""
     summary = json.loads(

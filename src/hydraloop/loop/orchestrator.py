@@ -22,6 +22,7 @@ from ..config import Config
 from ..paths import run_dir
 from ..red.dsl.genome import Genome, genome_from_template
 from ..red.dsl.mutate import mutate
+from ..red.dsl.render import render_brief
 from ..red.llm import LLMClient
 from ..red.mixer import build_attack_specs
 from ..red.strategist import Strategist, audit_report
@@ -160,6 +161,12 @@ def run_loop(
         else None
     )
     proposals: list[Genome] = []
+    # Every genome the twin actually simulated, keyed by id. Mutation and
+    # strategist proposals both mint new ids each generation, so the Lineage
+    # screen can only name an escaping genome if the run records the whole
+    # population rather than just the catalog it started from.
+    seen_genomes: dict[str, Genome] = {}
+    genome_first_seen: dict[str, int] = {}
     escaped_ids: set[str] = set()
     prev_escape_rate: float | None = None
     escapes_closed_total = 0
@@ -197,6 +204,11 @@ def run_loop(
             val_ref = memory.all_data()
             decision_engine = build_policy_engine(cfg_g, registry.incumbent, val_ref)
         gen_df, _ = _run_generation_sim(cfg_g, genomes, decision_engine, defender_cfg)
+
+        for gen_genome in genomes:
+            if gen_genome.genome_id not in seen_genomes:
+                seen_genomes[gen_genome.genome_id] = gen_genome
+                genome_first_seen[gen_genome.genome_id] = g
 
         # 2. Measure escapes (fraud the policy approved).
         esc = escaped_frame(gen_df)
@@ -264,7 +276,7 @@ def run_loop(
                     "cluster_id": c.cluster_id,
                     "size": c.size,
                     "dominant_attack_id": c.dominant_attack_id,
-                    "dominant_genome": c.dominant_family,
+                    "dominant_genome": c.dominant_genome_id,
                 }
                 for c in clusters
             ],
@@ -285,6 +297,21 @@ def run_loop(
         (out / "strategist_audit.json").write_text(
             json.dumps(report, indent=2), encoding="utf-8"
         )
+
+    # Read by the Lineage screen to turn an escaping genome id into a family and
+    # a plain-English brief. Written for every run, not just the curated example.
+    genomes_manifest = [
+        {
+            "attack_id": gm.attack_id,
+            "genome_id": gid,
+            "family": gm.family,
+            "brief": render_brief(gm),
+            "parent_id": gm.parent_id,
+            "first_seen_generation": genome_first_seen[gid],
+        }
+        for gid, gm in seen_genomes.items()
+    ]
+    (out / "genomes.json").write_text(json.dumps(genomes_manifest, indent=2), encoding="utf-8")
 
     headline = ("provider", "model", "available", "proposals", "accepted", "refused", "llm_authored")
     summary = {

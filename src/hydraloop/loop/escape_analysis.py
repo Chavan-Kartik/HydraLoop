@@ -20,7 +20,7 @@ from ..blue.features import MODEL_FEATURES
 class EscapeCluster:
     cluster_id: int
     size: int
-    dominant_family: str
+    dominant_genome_id: str
     dominant_attack_id: str
     gene_pattern: dict[str, float]
     txn_ids: list[str] = field(default_factory=list)
@@ -49,15 +49,23 @@ def cluster_escapes(df: pd.DataFrame, k_max: int = 4, seed: int = 42) -> list[Es
     clusters: list[EscapeCluster] = []
     for cid in sorted(set(labels.tolist())):
         rows = esc[labels == cid]
-        fam = str(rows["attack_id"].fillna("unknown").mode().iloc[0]) if len(rows) else "unknown"
-        family = str(rows["genome_id"].fillna("unknown").mode().iloc[0]) if len(rows) else "unknown"
+        genome_id = str(rows["genome_id"].fillna("unknown").mode().iloc[0]) if len(rows) else "unknown"
+        # Taken from the dominant genome's own rows rather than as a second
+        # independent mode over the cluster. A cluster mixes attacks, so the two
+        # modes can disagree, and a genome labelled with another attack's id
+        # renders as the wrong family and the wrong brief on the Lineage screen.
+        own = rows[rows["genome_id"] == genome_id]
+        labelled = own if len(own) else rows
+        attack_id = (
+            str(labelled["attack_id"].fillna("unknown").mode().iloc[0]) if len(labelled) else "unknown"
+        )
         pattern = {f: float(rows[f].astype(float).mean()) for f in MODEL_FEATURES}
         clusters.append(
             EscapeCluster(
                 cluster_id=int(cid),
                 size=int(len(rows)),
-                dominant_family=family,
-                dominant_attack_id=fam,
+                dominant_genome_id=genome_id,
+                dominant_attack_id=attack_id,
                 gene_pattern=pattern,
                 txn_ids=[str(t) for t in rows["txn_id"].tolist()],
             )
