@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ..loop.ledger import GENESIS, GenerationLedger, _digest
+from ..loop.ledger import GENESIS, GenerationLedger, _digest, canonical_payload
 from ..paths import EXAMPLES_DIR, REPORTS_DIR, RUNS_DIR
 
 
@@ -291,6 +291,9 @@ def verify_ledger(run_id: str) -> dict:
                 "escape_rate": payload.get("escape_rate", 0.0),
                 "config_hash": payload.get("config_hash", ""),
                 "link_ok": ok,
+                # The bytes the digest is taken over, so the browser can redo the
+                # hash itself instead of being told the answer.
+                "canonical": canonical_payload(payload),
             }
         )
         prev = entry["entry_hash"]
@@ -300,6 +303,8 @@ def verify_ledger(run_id: str) -> dict:
         "break_at": break_at,
         "head_hash": raw_entries[-1]["entry_hash"] if raw_entries else GENESIS,
         "length": len(raw_entries),
+        "algorithm": "blake2b-128",
+        "genesis": GENESIS,
         "entries": rows,
     }
 

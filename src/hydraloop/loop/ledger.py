@@ -15,8 +15,18 @@ from typing import Any
 GENESIS = "0" * 32
 
 
+def canonical_payload(payload: dict[str, Any]) -> str:
+    """The exact payload serialisation the digest is taken over.
+
+    Exposed so a client can recompute a digest without having to reproduce
+    Python's float formatting, which differs from other languages on values like
+    ``1.0`` and would otherwise make an independent check fail on correct data.
+    """
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"))
+
+
 def _digest(prev_hash: str, payload: dict[str, Any]) -> str:
-    body = prev_hash + json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    body = prev_hash + canonical_payload(payload)
     return hashlib.blake2b(body.encode("utf-8"), digest_size=16).hexdigest()
 
 

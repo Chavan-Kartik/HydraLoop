@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -78,6 +80,26 @@ def test_governance_detects_tampering(client, seeded_run, tmp_path):
     data = client.get(f"/api/governance/{seeded_run}").json()
     assert data["verified"] is False
     assert data["break_at"] == 0
+
+
+def test_governance_ships_the_bytes_a_client_needs_to_recheck_the_digest(client, seeded_run):
+    """The Audit screen recomputes the chain itself rather than trusting the API.
+
+    That is only possible if the response carries the exact payload bytes the
+    digest covers. Reproducing Python's float formatting in the browser would
+    fail on values like 1.0, so the serialisation has to come from here.
+    """
+    from hydraloop.loop.ledger import _digest, canonical_payload
+
+    data = client.get(f"/api/governance/{seeded_run}").json()
+    assert data["algorithm"] == "blake2b-128"
+    assert data["genesis"] == "0" * 32
+    for entry in data["entries"]:
+        assert entry["canonical"], "no payload bytes to hash"
+        payload = json.loads(entry["canonical"])
+        # Round-tripping the shipped bytes must reproduce the stored digest.
+        assert canonical_payload(payload) == entry["canonical"]
+        assert _digest(entry["prev_hash"], payload) == entry["entry_hash"]
 
 
 def test_kpis_summarise_run(client, seeded_run):

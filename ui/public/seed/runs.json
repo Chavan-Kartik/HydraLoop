@@ -1,11 +1,74 @@
 {
   "runs": [
     {
+      "run_id": "test_loop_refuse",
+      "source": "runs",
+      "generations": 2,
+      "head_hash": "31cd3ae045c02048357db5928ac60085",
+      "mtime": 1787804319.8701203
+    },
+    {
+      "run_id": "test_loop_llm",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "ba3a58a7a2bbdb790f39ccd9e0931f18",
+      "mtime": 1787804319.088348
+    },
+    {
+      "run_id": "test_loop_offline",
+      "source": "runs",
+      "generations": 2,
+      "head_hash": "3e78ad6f722b9620f9961ec402637d06",
+      "mtime": 1787804317.8788092
+    },
+    {
       "run_id": "test_loop",
       "source": "runs",
       "generations": 3,
-      "head_hash": "7449c113b6cf486081a58d11cdf594f8",
-      "mtime": 1786866358.7636425
+      "head_hash": "0a5133ade944781578f61cd89ec5c336",
+      "mtime": 1787804317.0506613
+    },
+    {
+      "run_id": "lineage_fix_test",
+      "source": "runs",
+      "generations": 2,
+      "head_hash": "112378c8e8f84ba08124c77bde5d9117",
+      "mtime": 1787804195.2890403
+    },
+    {
+      "run_id": "arena_20260816_214953",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "e20f6549359241f94d29824ad764eed7",
+      "mtime": 1786897195.8696914
+    },
+    {
+      "run_id": "arena_20260816_214922",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "e20f6549359241f94d29824ad764eed7",
+      "mtime": 1786897169.6449277
+    },
+    {
+      "run_id": "arena_20260816_214815",
+      "source": "runs",
+      "generations": 3,
+      "head_hash": "dae61caee05b4ae81c26f2a5e72e0580",
+      "mtime": 1786897101.4334528
+    },
+    {
+      "run_id": "arena_20260816_213853",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786896546.0974517
+    },
+    {
+      "run_id": "arena_20260816_212204",
+      "source": "runs",
+      "generations": 5,
+      "head_hash": "4383d66b8c0df3dff6672e2a078e818a",
+      "mtime": 1786895537.9600766
     },
     {
       "run_id": "arena_20260815_100755",

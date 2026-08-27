@@ -129,6 +129,8 @@ export type GovernanceEntry = {
   escape_rate: number;
   config_hash: string;
   link_ok: boolean;
+  /** Exact bytes the digest covers, so the browser can recompute it. */
+  canonical?: string;
 };
 
 export type Governance = {
@@ -137,6 +139,8 @@ export type Governance = {
   break_at: number | null;
   head_hash: string;
   length: number;
+  algorithm?: string;
+  genesis?: string;
   entries: GovernanceEntry[];
 };
 
