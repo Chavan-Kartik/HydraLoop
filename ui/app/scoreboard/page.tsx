@@ -6,8 +6,8 @@ export default function ScoreboardPage() {
     <div>
       <PageHeader
         eyebrow="Defend"
-        title="Scoreboard"
-        subtitle="Escape rate and archive recall by generation, against the friction budget the defense is allowed to spend, plus the regression gauntlet's verdicts."
+        title="Metrics"
+        subtitle="Did the loop actually work? Escape rate should fall generation over generation while archive recall holds, and every promotion or rollback the gauntlet decided is logged underneath."
       />
       <Scoreboard />
     </div>
